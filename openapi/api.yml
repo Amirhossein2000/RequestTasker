@@ -54,11 +54,11 @@ paths:
                     type: string
                     description: Generated unique ID for the task
 
-  /task/{taskId}:
+  /task/{id}:
     get:
       summary: Get the status of a task
       parameters:
-        - name: taskId
+        - name: id
           in: path
           required: true
           description: Unique ID of the task
