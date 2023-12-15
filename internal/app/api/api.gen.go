@@ -6,7 +6,9 @@ package api
 import (
 	"bytes"
 	"compress/gzip"
+	"context"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -16,6 +18,7 @@ import (
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/labstack/echo/v4"
 	"github.com/oapi-codegen/runtime"
+	strictecho "github.com/oapi-codegen/runtime/strictmiddleware/echo"
 )
 
 // Defines values for HttpMethod.
@@ -132,20 +135,221 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 
 }
 
+type PostTaskRequestObject struct {
+	Body *PostTaskJSONRequestBody
+}
+
+type PostTaskResponseObject interface {
+	VisitPostTaskResponse(w http.ResponseWriter) error
+}
+
+type PostTask201JSONResponse struct {
+	// Id Generated unique ID for the task
+	Id *string `json:"id,omitempty"`
+}
+
+func (response PostTask201JSONResponse) VisitPostTaskResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(201)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostTask400JSONResponse struct {
+	// Message Invalid request payload
+	Message *string `json:"message,omitempty"`
+}
+
+func (response PostTask400JSONResponse) VisitPostTaskResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostTask401JSONResponse struct {
+	// Message Unauthorized access. Please provide valid credentials.
+	Message *string `json:"message,omitempty"`
+}
+
+func (response PostTask401JSONResponse) VisitPostTaskResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostTask500JSONResponse struct {
+	// Message An error occurred while processing the request
+	Message *string `json:"message,omitempty"`
+}
+
+func (response PostTask500JSONResponse) VisitPostTaskResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetTaskIdRequestObject struct {
+	Id string `json:"id"`
+}
+
+type GetTaskIdResponseObject interface {
+	VisitGetTaskIdResponse(w http.ResponseWriter) error
+}
+
+type GetTaskId200JSONResponse struct {
+	// Headers Headers array from 3rd-party service response
+	Headers *map[string]interface{} `json:"headers,omitempty"`
+
+	// HttpStatusCode HTTP status code of the 3rd-party service response
+	HttpStatusCode *int `json:"httpStatusCode,omitempty"`
+
+	// Id Unique ID of the task
+	Id *string `json:"id,omitempty"`
+
+	// Length Content length of 3rd-party service response
+	Length *int        `json:"length,omitempty"`
+	Status *TaskStatus `json:"status,omitempty"`
+}
+
+func (response GetTaskId200JSONResponse) VisitGetTaskIdResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetTaskId401JSONResponse struct {
+	// Message Unauthorized access. Please provide valid credentials.
+	Message *string `json:"message,omitempty"`
+}
+
+func (response GetTaskId401JSONResponse) VisitGetTaskIdResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetTaskId404JSONResponse struct {
+	// Message Task not found with the given ID
+	Message *string `json:"message,omitempty"`
+}
+
+func (response GetTaskId404JSONResponse) VisitGetTaskIdResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetTaskId500JSONResponse struct {
+	// Message An error occurred while processing the request
+	Message *string `json:"message,omitempty"`
+}
+
+func (response GetTaskId500JSONResponse) VisitGetTaskIdResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+// StrictServerInterface represents all server handlers.
+type StrictServerInterface interface {
+	// Create a new task for HTTP request to 3rd-party service
+	// (POST /task)
+	PostTask(ctx context.Context, request PostTaskRequestObject) (PostTaskResponseObject, error)
+	// Get the status of a task
+	// (GET /task/{id})
+	GetTaskId(ctx context.Context, request GetTaskIdRequestObject) (GetTaskIdResponseObject, error)
+}
+
+type StrictHandlerFunc = strictecho.StrictEchoHandlerFunc
+type StrictMiddlewareFunc = strictecho.StrictEchoMiddlewareFunc
+
+func NewStrictHandler(ssi StrictServerInterface, middlewares []StrictMiddlewareFunc) ServerInterface {
+	return &strictHandler{ssi: ssi, middlewares: middlewares}
+}
+
+type strictHandler struct {
+	ssi         StrictServerInterface
+	middlewares []StrictMiddlewareFunc
+}
+
+// PostTask operation middleware
+func (sh *strictHandler) PostTask(ctx echo.Context) error {
+	var request PostTaskRequestObject
+
+	var body PostTaskJSONRequestBody
+	if err := ctx.Bind(&body); err != nil {
+		return err
+	}
+	request.Body = &body
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.PostTask(ctx.Request().Context(), request.(PostTaskRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "PostTask")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(PostTaskResponseObject); ok {
+		return validResponse.VisitPostTaskResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// GetTaskId operation middleware
+func (sh *strictHandler) GetTaskId(ctx echo.Context, id string) error {
+	var request GetTaskIdRequestObject
+
+	request.Id = id
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.GetTaskId(ctx.Request().Context(), request.(GetTaskIdRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetTaskId")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(GetTaskIdResponseObject); ok {
+		return validResponse.VisitGetTaskIdResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
+	"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",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file
