@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	entities "RequestTaster/internal/domian/entities"
+	entities "RequestTasker/internal/domian/entities"
 
 	mock "github.com/stretchr/testify/mock"
 
@@ -16,21 +16,31 @@ type TaskRepositoryMock struct {
 }
 
 // Create provides a mock function with given fields: _a0
-func (_m *TaskRepositoryMock) Create(_a0 entities.Task) error {
+func (_m *TaskRepositoryMock) Create(_a0 entities.Task) (entities.Task, error) {
 	ret := _m.Called(_a0)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Create")
 	}
 
-	var r0 error
-	if rf, ok := ret.Get(0).(func(entities.Task) error); ok {
+	var r0 entities.Task
+	var r1 error
+	if rf, ok := ret.Get(0).(func(entities.Task) (entities.Task, error)); ok {
+		return rf(_a0)
+	}
+	if rf, ok := ret.Get(0).(func(entities.Task) entities.Task); ok {
 		r0 = rf(_a0)
 	} else {
-		r0 = ret.Error(0)
+		r0 = ret.Get(0).(entities.Task)
 	}
 
-	return r0
+	if rf, ok := ret.Get(1).(func(entities.Task) error); ok {
+		r1 = rf(_a0)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
 }
 
 // GetByPublicID provides a mock function with given fields: publicId

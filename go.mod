@@ -1,4 +1,4 @@
-module RequestTaster
+module RequestTasker
 
 go 1.21.5
 
