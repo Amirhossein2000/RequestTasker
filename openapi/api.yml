@@ -1,0 +1,88 @@
+openapi: 3.0.0
+info:
+  title: HTTP Server for 3rd-party Services
+  version: 1.0.0
+components:
+  schemas:
+    TaskStatus:
+      type: string
+      enum: [done, in_process, error, new]
+
+    HttpMethod:
+      type: string
+      enum: [GET, POST, PUT, DELETE, PATCH, HEAD, OPTIONS]
+
+    TaskRequest:
+      type: object
+      properties:
+        method:
+          $ref: '#/components/schemas/HttpMethod'
+          description: HTTP method (GET, POST, etc.)
+        url:
+          type: string
+          format: uri
+          description: URL of the 3rd-party service
+        headers:
+          type: object
+          description: Headers for the HTTP request
+        body:
+          type: object
+          description: Request body payload
+      required:
+        - method
+        - url
+
+paths:
+  /task:
+    post:
+      summary: Create a new task for HTTP request to 3rd-party service
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: Generated unique ID for the task
+
+  /task/{taskId}:
+    get:
+      summary: Get the status of a task
+      parameters:
+        - name: taskId
+          in: path
+          required: true
+          description: Unique ID of the task
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: Unique ID of the task
+                  status:
+                    $ref: '#/components/schemas/TaskStatus'
+                  httpStatusCode:
+                    type: integer
+                    description: HTTP status code of the 3rd-party service response
+                  headers:
+                    type: object
+                    description: Headers array from 3rd-party service response
+                  length:
+                    type: integer
+                    description: Content length of 3rd-party service response
