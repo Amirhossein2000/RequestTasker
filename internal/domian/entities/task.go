@@ -6,6 +6,7 @@ import (
 	"github.com/google/uuid"
 )
 
+//go:generate mockery --name TaskRepository --structname TaskRepositoryMock --output ../../mocks/ 
 type TaskRepository interface {
 	Create(Task) error
 	GetByPublicID(publicId uuid.UUID) (Task, error)

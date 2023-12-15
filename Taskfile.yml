@@ -1,11 +1,12 @@
 version: "3"
 
 tasks:
-  generate_api:
+  generate-api:
     cmds:
       - oapi-codegen -generate types,server,strict-server,spec -package api ./openapi/api.yml > ./internal/app/api/api.gen.go
-      
-# generate mocks
+  generate-mock:
+    cmds:
+      - go generate ./internal/domian/entities
 
 # setup dependencies
 

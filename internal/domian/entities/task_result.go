@@ -4,6 +4,7 @@ import (
 	"time"
 )
 
+//go:generate mockery --name TaskResultRepository --structname TaskResultRepositoryMock --output ../../mocks/ 
 type TaskResultRepository interface {
 	Create(TaskResult) error
 	GetByTaskID(taskID int64) (TaskResult, error)
