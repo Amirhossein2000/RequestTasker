@@ -7,6 +7,9 @@ tasks:
   generate-mock:
     cmds:
       - go generate ./internal/domian/entities
+  build:
+    cmds:
+    - go build -o ./bin ./cmd/
 
 # setup dependencies
 
