@@ -28,7 +28,7 @@ func TestCreateTaskUseCase_Execute(t *testing.T) {
 
 		expectedErr := errors.New("expectedErr")
 		newTask := entities.NewTask("url", "method", nil, nil)
-		createdTask := entities.BuildTask(
+		expectedTask := entities.BuildTask(
 			rand.Int63(),
 			newTask.CreatedAt(),
 			newTask.PublicID(),
@@ -37,41 +37,53 @@ func TestCreateTaskUseCase_Execute(t *testing.T) {
 			newTask.Headers(),
 			newTask.Body(),
 		)
-		status := entities.NewTaskStatus(createdTask.ID(), common.StatusNEW)
+		status := entities.NewTaskStatus(expectedTask.ID(), common.StatusNEW)
 
 		Convey("When taskRepository.Create() returns error", func() {
-			taskRepository.On("Create", newTask).Return(entities.Task{}, expectedErr)
+			taskRepository.
+				On("Create", newTask).
+				Return(entities.Task{}, expectedErr)
 
 			_, err := createTaskUseCase.Execute(newTask)
 			So(err, ShouldEqual, common.InternalError)
 		})
 
 		Convey("When taskRepository.Create() works", func() {
-			taskRepository.On("Create", newTask).Return(createdTask, nil)
+			taskRepository.
+				On("Create", newTask).
+				Return(expectedTask, nil)
 
 			Convey("When taskStatusRepository.Create() returns error", func() {
-				taskStatusRepository.On("Create", status).Return(expectedErr)
+				taskStatusRepository.
+					On("Create", status).
+					Return(expectedErr)
 
 				_, err := createTaskUseCase.Execute(newTask)
 				So(err, ShouldEqual, common.InternalError)
 			})
 
 			Convey("When taskStatusRepository.Create() works", func() {
-				taskStatusRepository.On("Create", status).Return(nil)
+				taskStatusRepository.
+					On("Create", status).
+					Return(nil)
 
 				Convey("When requestTasker.RegisterTask() returns error", func() {
-					requestTasker.On("RegisterTask", createdTask).Return(expectedErr)
+					requestTasker.
+						On("RegisterTask", expectedTask).
+						Return(expectedErr)
 
 					_, err := createTaskUseCase.Execute(newTask)
 					So(err, ShouldEqual, common.InternalError)
 				})
 
 				Convey("When requestTasker.RegisterTask() works", func() {
-					requestTasker.On("RegisterTask", createdTask).Return(nil)
-	
+					requestTasker.
+						On("RegisterTask", expectedTask).
+						Return(nil)
+
 					publicID, err := createTaskUseCase.Execute(newTask)
 					So(err, ShouldBeNil)
-					So(publicID, ShouldEqual, createdTask.PublicID())
+					So(publicID, ShouldEqual, expectedTask.PublicID())
 				})
 			})
 		})
