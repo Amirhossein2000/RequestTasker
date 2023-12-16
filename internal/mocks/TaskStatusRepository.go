@@ -31,12 +31,12 @@ func (_m *TaskStatusRepositoryMock) Create(_a0 entities.TaskStatus) error {
 	return r0
 }
 
-// GetByTaskID provides a mock function with given fields: taskID
-func (_m *TaskStatusRepositoryMock) GetByTaskID(taskID int64) (entities.TaskStatus, error) {
+// GetLatestByTaskID provides a mock function with given fields: taskID
+func (_m *TaskStatusRepositoryMock) GetLatestByTaskID(taskID int64) (entities.TaskStatus, error) {
 	ret := _m.Called(taskID)
 
 	if len(ret) == 0 {
-		panic("no return value specified for GetByTaskID")
+		panic("no return value specified for GetLatestByTaskID")
 	}
 
 	var r0 entities.TaskStatus

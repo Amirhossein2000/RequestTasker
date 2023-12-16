@@ -1,13 +1,15 @@
 package entities
 
 import (
+	"RequestTasker/internal/domian/common"
+	"slices"
 	"time"
 )
 
-//go:generate mockery --name TaskStatusRepository --structname TaskStatusRepositoryMock --output ../../mocks/ 
+//go:generate mockery --name TaskStatusRepository --structname TaskStatusRepositoryMock --output ../../mocks/
 type TaskStatusRepository interface {
 	Create(TaskStatus) error
-	GetByTaskID(taskID int64) (TaskStatus, error)
+	GetLatestByTaskID(taskID int64) (TaskStatus, error)
 }
 
 type TaskStatus struct {
@@ -55,4 +57,13 @@ func (ts TaskStatus) Status() string {
 
 func (ts TaskStatus) TaskID() int64 {
 	return ts.taskID
+}
+
+func (ts TaskStatus) HasResult() bool {
+	return slices.Contains(
+		[]string{
+			common.StatusDONE,
+			common.StatusERROR,
+		},
+		ts.status)
 }
