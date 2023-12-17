@@ -14,3 +14,7 @@ brew install go-task
 go install github.com/vektra/mockery/v2@v2.38.0
 brew install mockery
 ```
+
+``` bash
+brew install golang-migrate
+```

@@ -1,0 +1,5 @@
+DROP TABLE IF EXISTS task_result;
+
+DROP TABLE IF EXISTS task_status;
+
+DROP TABLE IF EXISTS task;
