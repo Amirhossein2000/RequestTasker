@@ -58,7 +58,7 @@ func (r *TaskStatusRepository) Create(ctx context.Context, taskStatus entities.T
 
 	lastInsertID, err := result.LastInsertId()
 	if err != nil {
-		return nil, fmt.Errorf("failed to get last insert ID: %w", err)
+		return nil, fmt.Errorf("failed to get last taskStatus insert ID: %w", err)
 	}
 
 	createdTaskStatus := entities.BuildTaskStatus(
@@ -84,7 +84,7 @@ func (r *TaskStatusRepository) GetLatestByTaskID(ctx context.Context, taskID int
 	case err == dbr.ErrNotFound:
 		return nil, common.NotFoundError
 	case err != nil:
-		return nil, fmt.Errorf("failed to get task by public ID: %w", err)
+		return nil, fmt.Errorf("failed to GetLatestByTaskID: %w", err)
 	}
 
 	return taskStatusRow.ConvertToEntity()

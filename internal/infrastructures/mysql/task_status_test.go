@@ -44,7 +44,7 @@ func TestTaskStatusRepository(t *testing.T) {
 			So(createdTaskStatus.TaskID(), ShouldEqual, taskStatus.TaskID())
 			So(createdTaskStatus.Status(), ShouldEqual, taskStatus.Status())
 
-			Convey("TaskStatusRepository.GetByPublicID()", func() {
+			Convey("TaskStatusRepository.GetLatestByTaskID()", func() {
 				foundTaskStatus, err := repo.GetLatestByTaskID(context.Background(), createdTaskStatus.TaskID())
 				So(err, ShouldBeNil)
 

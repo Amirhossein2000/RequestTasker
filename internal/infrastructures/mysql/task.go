@@ -102,7 +102,7 @@ func (r *TaskRepository) Create(ctx context.Context, task entities.Task) (*entit
 
 	lastInsertID, err := result.LastInsertId()
 	if err != nil {
-		return nil, fmt.Errorf("failed to get last insert ID: %w", err)
+		return nil, fmt.Errorf("failed to get last task insert ID: %w", err)
 	}
 
 	createdTask := entities.BuildTask(
@@ -131,7 +131,7 @@ func (r *TaskRepository) GetByPublicID(ctx context.Context, publicID uuid.UUID) 
 	case err == dbr.ErrNotFound:
 		return nil, common.NotFoundError
 	case err != nil:
-		return nil, fmt.Errorf("failed to get task by public ID: %w", err)
+		return nil, fmt.Errorf("failed to GetByPublicID: %w", err)
 	}
 
 	return taskRow.ConvertToEntity()
