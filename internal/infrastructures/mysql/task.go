@@ -56,19 +56,19 @@ func (r *TaskRow) ConvertToEntity() (*entities.Task, error) {
 	return &task, nil
 }
 
-type MySQLTaskRepository struct {
+type TaskRepository struct {
 	session   *dbr.Session
 	tableName string
 }
 
-func NewTaskRepository(session *dbr.Session, tableName string) *MySQLTaskRepository {
-	return &MySQLTaskRepository{
+func NewTaskRepository(session *dbr.Session, tableName string) *TaskRepository {
+	return &TaskRepository{
 		session:   session,
 		tableName: tableName,
 	}
 }
 
-func (r *MySQLTaskRepository) Create(ctx context.Context, task entities.Task) (*entities.Task, error) {
+func (r *TaskRepository) Create(ctx context.Context, task entities.Task) (*entities.Task, error) {
 	headers, err := json.Marshal(task.Headers())
 	if err != nil {
 		return nil, err
@@ -118,7 +118,7 @@ func (r *MySQLTaskRepository) Create(ctx context.Context, task entities.Task) (*
 	return &createdTask, nil
 }
 
-func (r *MySQLTaskRepository) GetByPublicID(ctx context.Context, publicID uuid.UUID) (*entities.Task, error) {
+func (r *TaskRepository) GetByPublicID(ctx context.Context, publicID uuid.UUID) (*entities.Task, error) {
 	taskRow := &TaskRow{}
 
 	err := r.session.Select("*").

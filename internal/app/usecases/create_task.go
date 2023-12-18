@@ -4,13 +4,14 @@ import (
 	"RequestTasker/internal/app/services/logger"
 	"RequestTasker/internal/domian/common"
 	"RequestTasker/internal/domian/entities"
+	"context"
 
 	"github.com/google/uuid"
 )
 
 //go:generate mockery --name RequestTasker --structname RequestTaskerMock --output ../../mocks/
 type RequestTasker interface {
-	RegisterTask(entities.Task) error
+	RegisterTask(ctx context.Context, task entities.Task) error
 }
 
 type CreateTaskUseCase struct {
@@ -34,25 +35,25 @@ func NewCreateTaskUseCase(
 	}
 }
 
-func (u CreateTaskUseCase) Execute(task entities.Task) (uuid.UUID, error) {
-	task, err := u.taskRepository.Create(task)
+func (u CreateTaskUseCase) Execute(ctx context.Context, task entities.Task) (uuid.UUID, error) {
+	createdTask, err := u.taskRepository.Create(ctx, task)
 	if err != nil {
 		// TODO log
 		return uuid.Nil, common.InternalError
 	}
 
-	status := entities.NewTaskStatus(task.ID(), common.StatusNEW)
-	err = u.taskStatusRepository.Create(status)
+	status := entities.NewTaskStatus(createdTask.ID(), common.StatusNEW)
+	_, err = u.taskStatusRepository.Create(ctx, status)
 	if err != nil {
 		// TODO log
 		return uuid.Nil, common.InternalError
 	}
 
-	err = u.requestTasker.RegisterTask(task)
+	err = u.requestTasker.RegisterTask(ctx, *createdTask)
 	if err != nil {
 		// TODO log
 		return uuid.Nil, common.InternalError
 	}
 
-	return task.PublicID(), nil
+	return createdTask.PublicID(), nil
 }

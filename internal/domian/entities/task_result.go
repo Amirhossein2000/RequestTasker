@@ -1,13 +1,14 @@
 package entities
 
 import (
+	"context"
 	"time"
 )
 
-//go:generate mockery --name TaskResultRepository --structname TaskResultRepositoryMock --output ../../mocks/ 
+//go:generate mockery --name TaskResultRepository --structname TaskResultRepositoryMock --output ../../mocks/
 type TaskResultRepository interface {
-	Create(TaskResult) error
-	GetByTaskID(taskID int64) (TaskResult, error)
+	Create(ctx context.Context, taskResult TaskResult) (*TaskResult, error)
+	GetByTaskID(ctx context.Context, taskID int64) (*TaskResult, error)
 }
 
 type TaskResult struct {

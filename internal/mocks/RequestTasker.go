@@ -4,6 +4,7 @@ package mocks
 
 import (
 	entities "RequestTasker/internal/domian/entities"
+	context "context"
 
 	mock "github.com/stretchr/testify/mock"
 )
@@ -13,17 +14,17 @@ type RequestTaskerMock struct {
 	mock.Mock
 }
 
-// RegisterTask provides a mock function with given fields: _a0
-func (_m *RequestTaskerMock) RegisterTask(_a0 entities.Task) error {
-	ret := _m.Called(_a0)
+// RegisterTask provides a mock function with given fields: ctx, task
+func (_m *RequestTaskerMock) RegisterTask(ctx context.Context, task entities.Task) error {
+	ret := _m.Called(ctx, task)
 
 	if len(ret) == 0 {
 		panic("no return value specified for RegisterTask")
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(entities.Task) error); ok {
-		r0 = rf(_a0)
+	if rf, ok := ret.Get(0).(func(context.Context, entities.Task) error); ok {
+		r0 = rf(ctx, task)
 	} else {
 		r0 = ret.Error(0)
 	}

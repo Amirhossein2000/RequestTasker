@@ -4,6 +4,7 @@ package mocks
 
 import (
 	entities "RequestTasker/internal/domian/entities"
+	context "context"
 
 	mock "github.com/stretchr/testify/mock"
 
@@ -15,27 +16,29 @@ type TaskRepositoryMock struct {
 	mock.Mock
 }
 
-// Create provides a mock function with given fields: _a0
-func (_m *TaskRepositoryMock) Create(_a0 entities.Task) (entities.Task, error) {
-	ret := _m.Called(_a0)
+// Create provides a mock function with given fields: ctx, task
+func (_m *TaskRepositoryMock) Create(ctx context.Context, task entities.Task) (*entities.Task, error) {
+	ret := _m.Called(ctx, task)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Create")
 	}
 
-	var r0 entities.Task
+	var r0 *entities.Task
 	var r1 error
-	if rf, ok := ret.Get(0).(func(entities.Task) (entities.Task, error)); ok {
-		return rf(_a0)
+	if rf, ok := ret.Get(0).(func(context.Context, entities.Task) (*entities.Task, error)); ok {
+		return rf(ctx, task)
 	}
-	if rf, ok := ret.Get(0).(func(entities.Task) entities.Task); ok {
-		r0 = rf(_a0)
+	if rf, ok := ret.Get(0).(func(context.Context, entities.Task) *entities.Task); ok {
+		r0 = rf(ctx, task)
 	} else {
-		r0 = ret.Get(0).(entities.Task)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*entities.Task)
+		}
 	}
 
-	if rf, ok := ret.Get(1).(func(entities.Task) error); ok {
-		r1 = rf(_a0)
+	if rf, ok := ret.Get(1).(func(context.Context, entities.Task) error); ok {
+		r1 = rf(ctx, task)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -43,27 +46,29 @@ func (_m *TaskRepositoryMock) Create(_a0 entities.Task) (entities.Task, error) {
 	return r0, r1
 }
 
-// GetByPublicID provides a mock function with given fields: publicId
-func (_m *TaskRepositoryMock) GetByPublicID(publicId uuid.UUID) (entities.Task, error) {
-	ret := _m.Called(publicId)
+// GetByPublicID provides a mock function with given fields: ctx, publicId
+func (_m *TaskRepositoryMock) GetByPublicID(ctx context.Context, publicId uuid.UUID) (*entities.Task, error) {
+	ret := _m.Called(ctx, publicId)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetByPublicID")
 	}
 
-	var r0 entities.Task
+	var r0 *entities.Task
 	var r1 error
-	if rf, ok := ret.Get(0).(func(uuid.UUID) (entities.Task, error)); ok {
-		return rf(publicId)
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) (*entities.Task, error)); ok {
+		return rf(ctx, publicId)
 	}
-	if rf, ok := ret.Get(0).(func(uuid.UUID) entities.Task); ok {
-		r0 = rf(publicId)
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) *entities.Task); ok {
+		r0 = rf(ctx, publicId)
 	} else {
-		r0 = ret.Get(0).(entities.Task)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*entities.Task)
+		}
 	}
 
-	if rf, ok := ret.Get(1).(func(uuid.UUID) error); ok {
-		r1 = rf(publicId)
+	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID) error); ok {
+		r1 = rf(ctx, publicId)
 	} else {
 		r1 = ret.Error(1)
 	}

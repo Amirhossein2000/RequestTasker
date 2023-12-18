@@ -1,6 +1,7 @@
 package entities
 
 import (
+	"context"
 	"time"
 
 	"github.com/google/uuid"
@@ -8,8 +9,8 @@ import (
 
 //go:generate mockery --name TaskRepository --structname TaskRepositoryMock --output ../../mocks/
 type TaskRepository interface {
-	Create(Task) (Task, error)
-	GetByPublicID(publicId uuid.UUID) (Task, error)
+	Create(ctx context.Context, task Task) (*Task, error)
+	GetByPublicID(ctx context.Context, publicId uuid.UUID) (*Task, error)
 }
 
 type Task struct {

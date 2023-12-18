@@ -4,6 +4,7 @@ import (
 	"RequestTasker/internal/app/services/logger"
 	"RequestTasker/internal/domian/common"
 	"RequestTasker/internal/domian/entities"
+	"context"
 
 	"github.com/google/uuid"
 )
@@ -29,28 +30,28 @@ func NewGetTaskUseCase(
 	}
 }
 
-func (u GetTaskUseCase) Execute(publicID uuid.UUID) (*entities.Task, *entities.TaskStatus, *entities.TaskResult, error) {
-	task, err := u.taskRepository.GetByPublicID(publicID)
+func (u GetTaskUseCase) Execute(ctx context.Context, publicID uuid.UUID) (*entities.Task, *entities.TaskStatus, *entities.TaskResult, error) {
+	task, err := u.taskRepository.GetByPublicID(ctx, publicID)
 	if err != nil {
 		// TODO log
 		return nil, nil, nil, common.InternalError
 	}
 
-	taskStatus, err := u.taskStatusRepository.GetLatestByTaskID(task.ID())
+	taskStatus, err := u.taskStatusRepository.GetLatestByTaskID(ctx, task.ID())
 	if err != nil {
 		// TODO log
 		return nil, nil, nil, common.InternalError
 	}
 
 	if !taskStatus.HasResult() {
-		return &task, &taskStatus, nil, nil
+		return task, taskStatus, nil, nil
 	}
 
-	taskResult, err := u.taskResultRepository.GetByTaskID(task.ID())
+	taskResult, err := u.taskResultRepository.GetByTaskID(ctx, task.ID())
 	if err != nil {
 		// TODO log
 		return nil, nil, nil, common.InternalError
 	}
 
-	return &task, &taskStatus, &taskResult, nil
+	return task, taskStatus, taskResult, nil
 }

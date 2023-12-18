@@ -1,9 +1,11 @@
 package usecases
 
 import (
+	"context"
 	"errors"
 	"math/rand"
 	"testing"
+	"time"
 
 	"RequestTasker/internal/app/services/logger"
 	"RequestTasker/internal/domian/common"
@@ -15,6 +17,9 @@ import (
 
 func TestGetTaskUseCase_Execute(t *testing.T) {
 	Convey("GetTaskUseCase.Execute()", t, func() {
+		ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+		defer cancel()
+
 		logger := logger.NewLogger()
 		taskRepository := mocks.NewTaskRepositoryMock(t)
 		taskStatusRepository := mocks.NewTaskStatusRepositoryMock(t)
@@ -41,33 +46,33 @@ func TestGetTaskUseCase_Execute(t *testing.T) {
 
 		Convey("When taskRepository.GetByPublicID() returns error", func() {
 			taskRepository.
-				On("GetByPublicID", expectedTask.PublicID()).
-				Return(entities.Task{}, expectedErr)
+				On("GetByPublicID", ctx, expectedTask.PublicID()).
+				Return(nil, expectedErr)
 
-			_, _, _, err := getTaskUseCase.Execute(expectedTask.PublicID())
+			_, _, _, err := getTaskUseCase.Execute(ctx, expectedTask.PublicID())
 			So(err, ShouldEqual, common.InternalError)
 		})
 
 		Convey("When taskRepository.GetByPublicID() works", func() {
 			taskRepository.
-				On("GetByPublicID", expectedTask.PublicID()).
-				Return(expectedTask, nil)
+				On("GetByPublicID", ctx, expectedTask.PublicID()).
+				Return(&expectedTask, nil)
 
 			Convey("When taskStatusRepository.GetLatestByTaskID() returns error", func() {
 				taskStatusRepository.
-					On("GetLatestByTaskID", expectedTask.ID()).
-					Return(expectedStatus, expectedErr)
+					On("GetLatestByTaskID", ctx, expectedTask.ID()).
+					Return(&expectedStatus, expectedErr)
 
-				_, _, _, err := getTaskUseCase.Execute(expectedTask.PublicID())
+				_, _, _, err := getTaskUseCase.Execute(ctx, expectedTask.PublicID())
 				So(err, ShouldEqual, common.InternalError)
 			})
 
 			Convey("When taskStatusRepository.GetLatestByTaskID() returns status without result", func() {
 				taskStatusRepository.
-					On("GetLatestByTaskID", expectedTask.ID()).
-					Return(expectedStatus, nil)
+					On("GetLatestByTaskID", ctx, expectedTask.ID()).
+					Return(&expectedStatus, nil)
 
-				task, status, _, err := getTaskUseCase.Execute(expectedTask.PublicID())
+				task, status, _, err := getTaskUseCase.Execute(ctx, expectedTask.PublicID())
 				So(err, ShouldBeNil)
 				So(task, ShouldResemble, &expectedTask)
 				So(status, ShouldResemble, &expectedStatus)
@@ -81,23 +86,25 @@ func TestGetTaskUseCase_Execute(t *testing.T) {
 					nil,
 					10,
 				)
-				taskStatusRepository.On("GetLatestByTaskID", expectedTask.ID()).Return(expectedStatus, nil)
+				taskStatusRepository.
+					On("GetLatestByTaskID", ctx, expectedTask.ID()).
+					Return(&expectedStatus, nil)
 
 				Convey("When taskResultRepository.GetByTaskID() returns error", func() {
 					taskResultRepository.
-						On("GetByTaskID", expectedTask.ID()).
-						Return(entities.TaskResult{}, expectedErr)
+						On("GetByTaskID", ctx, expectedTask.ID()).
+						Return(nil, expectedErr)
 
-					_, _, _, err := getTaskUseCase.Execute(expectedTask.PublicID())
+					_, _, _, err := getTaskUseCase.Execute(ctx, expectedTask.PublicID())
 					So(err, ShouldEqual, common.InternalError)
 				})
 
 				Convey("When taskResultRepository.GetByTaskID() works", func() {
 					taskResultRepository.
-						On("GetByTaskID", expectedTask.ID()).
-						Return(expectedResult, nil)
+						On("GetByTaskID", ctx, expectedTask.ID()).
+						Return(&expectedResult, nil)
 
-					task, status, result, err := getTaskUseCase.Execute(expectedTask.PublicID())
+					task, status, result, err := getTaskUseCase.Execute(ctx, expectedTask.PublicID())
 					So(err, ShouldBeNil)
 					So(task, ShouldResemble, &expectedTask)
 					So(status, ShouldResemble, &expectedStatus)

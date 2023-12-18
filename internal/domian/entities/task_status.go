@@ -2,14 +2,15 @@ package entities
 
 import (
 	"RequestTasker/internal/domian/common"
+	"context"
 	"slices"
 	"time"
 )
 
 //go:generate mockery --name TaskStatusRepository --structname TaskStatusRepositoryMock --output ../../mocks/
 type TaskStatusRepository interface {
-	Create(TaskStatus) error
-	GetLatestByTaskID(taskID int64) (TaskStatus, error)
+	Create(ctx context.Context, taskStatus TaskStatus) (*TaskStatus, error)
+	GetLatestByTaskID(ctx context.Context, taskID int64) (*TaskStatus, error)
 }
 
 type TaskStatus struct {

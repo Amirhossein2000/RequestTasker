@@ -4,6 +4,7 @@ package mocks
 
 import (
 	entities "RequestTasker/internal/domian/entities"
+	context "context"
 
 	mock "github.com/stretchr/testify/mock"
 )
@@ -13,45 +14,59 @@ type TaskResultRepositoryMock struct {
 	mock.Mock
 }
 
-// Create provides a mock function with given fields: _a0
-func (_m *TaskResultRepositoryMock) Create(_a0 entities.TaskResult) error {
-	ret := _m.Called(_a0)
+// Create provides a mock function with given fields: ctx, taskResult
+func (_m *TaskResultRepositoryMock) Create(ctx context.Context, taskResult entities.TaskResult) (*entities.TaskResult, error) {
+	ret := _m.Called(ctx, taskResult)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Create")
 	}
 
-	var r0 error
-	if rf, ok := ret.Get(0).(func(entities.TaskResult) error); ok {
-		r0 = rf(_a0)
+	var r0 *entities.TaskResult
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, entities.TaskResult) (*entities.TaskResult, error)); ok {
+		return rf(ctx, taskResult)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, entities.TaskResult) *entities.TaskResult); ok {
+		r0 = rf(ctx, taskResult)
 	} else {
-		r0 = ret.Error(0)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*entities.TaskResult)
+		}
 	}
 
-	return r0
+	if rf, ok := ret.Get(1).(func(context.Context, entities.TaskResult) error); ok {
+		r1 = rf(ctx, taskResult)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
 }
 
-// GetByTaskID provides a mock function with given fields: taskID
-func (_m *TaskResultRepositoryMock) GetByTaskID(taskID int64) (entities.TaskResult, error) {
-	ret := _m.Called(taskID)
+// GetByTaskID provides a mock function with given fields: ctx, taskID
+func (_m *TaskResultRepositoryMock) GetByTaskID(ctx context.Context, taskID int64) (*entities.TaskResult, error) {
+	ret := _m.Called(ctx, taskID)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetByTaskID")
 	}
 
-	var r0 entities.TaskResult
+	var r0 *entities.TaskResult
 	var r1 error
-	if rf, ok := ret.Get(0).(func(int64) (entities.TaskResult, error)); ok {
-		return rf(taskID)
+	if rf, ok := ret.Get(0).(func(context.Context, int64) (*entities.TaskResult, error)); ok {
+		return rf(ctx, taskID)
 	}
-	if rf, ok := ret.Get(0).(func(int64) entities.TaskResult); ok {
-		r0 = rf(taskID)
+	if rf, ok := ret.Get(0).(func(context.Context, int64) *entities.TaskResult); ok {
+		r0 = rf(ctx, taskID)
 	} else {
-		r0 = ret.Get(0).(entities.TaskResult)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*entities.TaskResult)
+		}
 	}
 
-	if rf, ok := ret.Get(1).(func(int64) error); ok {
-		r1 = rf(taskID)
+	if rf, ok := ret.Get(1).(func(context.Context, int64) error); ok {
+		r1 = rf(ctx, taskID)
 	} else {
 		r1 = ret.Error(1)
 	}
