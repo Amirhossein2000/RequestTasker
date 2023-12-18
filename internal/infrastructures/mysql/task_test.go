@@ -1,6 +1,7 @@
 package mysql
 
 import (
+	"RequestTasker/internal/domian/common"
 	"RequestTasker/internal/domian/entities"
 	"RequestTasker/internal/pkg/integration"
 	"context"
@@ -13,12 +14,11 @@ import (
 
 func TestTaskRepository(t *testing.T) {
 	Convey("TaskRepository INSERT and SELECT queries", t, func() {
-		conn, tearDown, err := integration.SetupMySQLContainer()
+		session, tearDown, err := integration.SetupMySQLContainer()
 		So(err, ShouldBeNil)
 		defer tearDown()
 
-		session := conn.NewSession(nil)
-		repo := NewTaskRepository(session, "tasks")
+		repo := NewTaskRepository(session, common.TaskTable)
 
 		task := entities.NewTask(
 			"https://example.com",

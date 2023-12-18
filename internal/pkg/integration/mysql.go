@@ -22,10 +22,14 @@ type testDB struct {
 
 var tb *testDB
 
-func SetupMySQLContainer() (*dbr.Connection, func(), error) {
+func SetupMySQLContainer() (*dbr.Session, func(), error) {
 	if tb != nil {
 		atomic.AddInt64(&tb.inUseCount, 1)
-		return tb.conn, nil, nil
+		return tb.conn.NewSession(nil),
+			func() {
+				atomic.AddInt64(&tb.inUseCount, -1)
+			},
+			nil
 	}
 
 	ctx := context.Background()
@@ -93,7 +97,7 @@ func SetupMySQLContainer() (*dbr.Connection, func(), error) {
 		inUseCount: 1,
 	}
 
-	return conn,
+	return conn.NewSession(nil),
 		func() {
 			inUseCount := atomic.AddInt64(&tb.inUseCount, -1)
 			if inUseCount < 1 {

@@ -14,12 +14,11 @@ import (
 
 func TestTaskStatusRepository(t *testing.T) {
 	Convey("TaskStatusRepository INSERT and SELECT queries", t, func() {
-		conn, tearDown, err := integration.SetupMySQLContainer()
+		session, tearDown, err := integration.SetupMySQLContainer()
 		So(err, ShouldBeNil)
 		defer tearDown()
 
-		session := conn.NewSession(nil)
-		repo := NewTaskStatusRepository(session, "task_statuses")
+		repo := NewTaskStatusRepository(session, common.TaskStatusTable)
 
 		task := entities.NewTask(
 			"https://example.com",
@@ -27,7 +26,7 @@ func TestTaskStatusRepository(t *testing.T) {
 			map[string]interface{}{"Authorization": "Bearer token"},
 			map[string]interface{}{"key": "value"},
 		)
-		taskRepo := NewTaskRepository(session, "tasks")
+		taskRepo := NewTaskRepository(session, common.TaskTable)
 		createdTask, err := taskRepo.Create(context.Background(), task)
 		So(err, ShouldBeNil)
 

@@ -10,6 +10,9 @@ tasks:
   build:
     cmds:
     - go build -o ./bin ./cmd/
+  test-db:
+    cmds:
+    - go test -v -parallel 4 RequestTasker/internal/infrastructures/mysql
 
 # setup dependencies
 
