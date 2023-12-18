@@ -61,7 +61,7 @@ type MySQLTaskRepository struct {
 	tableName string
 }
 
-func NewMySQLTaskRepository(session *dbr.Session, tableName string) *MySQLTaskRepository {
+func NewTaskRepository(session *dbr.Session, tableName string) *MySQLTaskRepository {
 	return &MySQLTaskRepository{
 		session:   session,
 		tableName: tableName,
