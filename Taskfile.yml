@@ -12,10 +12,10 @@ tasks:
     - go build -o ./bin ./cmd/
   test-db:
     cmds:
-    - go test -v RequestTasker/internal/infrastructures/mysql
+    - go test -v -count=1 RequestTasker/internal/infrastructures/mysql
   test-usecase:
     cmds:
-    - go test -v RequestTasker/internal/app/usecases
+    - go test -v -count=1 RequestTasker/internal/app/usecases
 
 # setup dependencies
 

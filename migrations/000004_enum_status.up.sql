@@ -1,0 +1,4 @@
+ALTER TABLE
+    task_statuses
+MODIFY
+    COLUMN status ENUM('DONE', 'IN_PROGRESS', 'ERROR', 'NEW') NOT NULL;
