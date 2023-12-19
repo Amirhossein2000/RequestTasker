@@ -28,26 +28,28 @@ func TestTaskEventRepository(t *testing.T) {
 			},
 		)
 
-		ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+		ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 		defer cancel()
 
 		err = repo.CreateTopics(ctx)
 		So(err, ShouldBeNil)
 
-		event := dto.TaskEvent{
-			ID: rand.Int63(),
+		for i := 0; i < 10; i++ {
+			event := dto.TaskEvent{
+				ID: rand.Int63(),
+			}
+			writeValue, err := event.Serialize()
+			So(err, ShouldBeNil)
+			
+			err = repo.Write(ctx, writeValue)
+			So(err, ShouldBeNil)
+			readValue, err := repo.Read(ctx)
+			So(err, ShouldBeNil)
+
+			So(readValue, ShouldEqual, writeValue)
+			receivedEvent, err := dto.NewTaskEvent(readValue)
+			So(err, ShouldBeNil)
+			So(event, ShouldEqual, *receivedEvent)
 		}
-		writeValue, err := event.Serialize()
-		So(err, ShouldBeNil)
-
-		err = repo.Write(ctx, writeValue)
-		So(err, ShouldBeNil)
-		readValue, err := repo.Read(ctx)
-		So(err, ShouldBeNil)
-
-		So(readValue, ShouldEqual, writeValue)
-		receivedEvent, err := dto.NewTaskEvent(readValue)
-		So(err, ShouldBeNil)
-		So(event, ShouldEqual, *receivedEvent)
 	})
 }

@@ -5,7 +5,7 @@ import (
 )
 
 type TaskEvent struct {
-	ID int64
+	ID int64 `json:"id"`
 }
 
 func NewTaskEvent(data []byte) (*TaskEvent, error) {
