@@ -24,7 +24,7 @@ func TestCreateTaskUseCase_Execute(t *testing.T) {
 		logger := logger.NewLogger()
 		taskRepository := mocks.NewTaskRepositoryMock(t)
 		taskStatusRepository := mocks.NewTaskStatusRepositoryMock(t)
-		requestTasker := mocks.NewRequestTaskerMock(t)
+		requestTasker := mocks.NewTaskerMock(t)
 		createTaskUseCase := NewCreateTaskUseCase(
 			logger,
 			taskRepository,

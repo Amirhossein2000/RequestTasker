@@ -6,7 +6,7 @@ tasks:
       - oapi-codegen -generate types,server,strict-server,spec -package api ./openapi/api.yml > ./internal/app/api/api.gen.go
   generate-mock:
     cmds:
-      - go generate ./internal/domain/entities
+      - go generate ./...
   build:
     cmds:
     - go build -o ./bin ./cmd/
