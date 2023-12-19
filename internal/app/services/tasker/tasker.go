@@ -1,9 +1,9 @@
 package tasker
 
 import (
-	"RequestTasker/internal/domian/common"
-	"RequestTasker/internal/domian/dto"
-	"RequestTasker/internal/domian/entities"
+	"RequestTasker/internal/domain/common"
+	"RequestTasker/internal/domain/dto"
+	"RequestTasker/internal/domain/entities"
 	"bytes"
 	"context"
 	"net/http"

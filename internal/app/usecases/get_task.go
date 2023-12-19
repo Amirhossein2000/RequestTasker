@@ -2,8 +2,8 @@ package usecases
 
 import (
 	"RequestTasker/internal/app/services/logger"
-	"RequestTasker/internal/domian/common"
-	"RequestTasker/internal/domian/entities"
+	"RequestTasker/internal/domain/common"
+	"RequestTasker/internal/domain/entities"
 	"context"
 
 	"github.com/google/uuid"

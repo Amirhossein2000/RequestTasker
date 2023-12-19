@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"time"
 
-	"RequestTasker/internal/domian/common"
-	"RequestTasker/internal/domian/entities"
+	"RequestTasker/internal/domain/common"
+	"RequestTasker/internal/domain/entities"
 
 	"github.com/gocraft/dbr/v2"
 	"github.com/google/uuid"

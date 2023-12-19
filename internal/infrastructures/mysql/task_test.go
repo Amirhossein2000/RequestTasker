@@ -1,7 +1,7 @@
 package mysql
 
 import (
-	"RequestTasker/internal/domian/common"
+	"RequestTasker/internal/domain/common"
 	"RequestTasker/internal/pkg/integration"
 	"RequestTasker/internal/pkg/test"
 	"context"

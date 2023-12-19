@@ -1,7 +1,7 @@
 package kafka
 
 import (
-	"RequestTasker/internal/domian/dto"
+	"RequestTasker/internal/domain/dto"
 	"RequestTasker/internal/pkg/integration"
 	"context"
 	"math/rand"
@@ -40,7 +40,7 @@ func TestTaskEventRepository(t *testing.T) {
 			}
 			writeValue, err := event.Serialize()
 			So(err, ShouldBeNil)
-			
+
 			err = repo.Write(ctx, writeValue)
 			So(err, ShouldBeNil)
 			readValue, err := repo.Read(ctx)

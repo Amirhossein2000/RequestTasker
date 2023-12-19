@@ -1,7 +1,7 @@
 package entities
 
 import (
-	"RequestTasker/internal/domian/common"
+	"RequestTasker/internal/domain/common"
 	"context"
 	"slices"
 	"time"

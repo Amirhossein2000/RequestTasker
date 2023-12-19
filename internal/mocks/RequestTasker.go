@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	entities "RequestTasker/internal/domian/entities"
+	entities "RequestTasker/internal/domain/entities"
 	context "context"
 
 	mock "github.com/stretchr/testify/mock"

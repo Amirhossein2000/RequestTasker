@@ -1,8 +1,8 @@
 package mysql
 
 import (
-	"RequestTasker/internal/domian/common"
-	"RequestTasker/internal/domian/entities"
+	"RequestTasker/internal/domain/common"
+	"RequestTasker/internal/domain/entities"
 	"context"
 	"fmt"
 	"time"
