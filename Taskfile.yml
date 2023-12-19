@@ -16,6 +16,9 @@ tasks:
   test-usecase:
     cmds:
     - go test -v -count=1 RequestTasker/internal/app/usecases
+  test-kafka:
+    cmds:
+    - go test -v -count=1 RequestTasker/internal/infrastructures/kafka
 
 # setup dependencies
 
