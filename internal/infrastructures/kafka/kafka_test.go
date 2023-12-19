@@ -1,30 +1,53 @@
 package kafka
 
 import (
+	"RequestTasker/internal/domian/dto"
 	"RequestTasker/internal/pkg/integration"
 	"context"
-	. "github.com/smartystreets/goconvey/convey"
+	"math/rand"
 	"testing"
 	"time"
+
+	. "github.com/smartystreets/goconvey/convey"
 )
 
 func TestTaskEventRepository(t *testing.T) {
 	Convey("TaskEventRepository Read and Write", t, func() {
-		addr, conn, _, cleanup, err := integration.SetupKafkaContainer()
-		if err != nil {
-			t.Fatalf("Failed to start Kafka container: %v", err)
-		}
+		addr, cleanup, err := integration.SetupKafkaContainer(context.Background())
+		So(err, ShouldBeNil)
 		defer cleanup()
 
-		repo := NewTaskEventRepository([]string{addr}, "test-topic", "test-group-id")
+		repo := NewTaskEventRepository(
+			KafkaConfig{
+				Brokers:           []string{addr},
+				Topic:             "test-topic",
+				GroupID:           "test-group-id",
+				Timeout:           time.Second * 10,
+				NumPartitions:     1,
+				ReplicationFactor: 1,
+			},
+		)
 
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 		defer cancel()
 
-		_, err = conn.Write([]byte("HI"))
+		err = repo.CreateTopics(ctx)
 		So(err, ShouldBeNil)
 
-		err = repo.Write(ctx, []byte("{\"Test_key\": \"Test Value\"}"))
+		event := dto.TaskEvent{
+			ID: rand.Int63(),
+		}
+		writeValue, err := event.Serialize()
 		So(err, ShouldBeNil)
+
+		err = repo.Write(ctx, writeValue)
+		So(err, ShouldBeNil)
+		readValue, err := repo.Read(ctx)
+		So(err, ShouldBeNil)
+
+		So(readValue, ShouldEqual, writeValue)
+		receivedEvent, err := dto.NewTaskEvent(readValue)
+		So(err, ShouldBeNil)
+		So(event, ShouldEqual, *receivedEvent)
 	})
 }
