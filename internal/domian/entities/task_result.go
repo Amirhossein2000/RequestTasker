@@ -16,14 +16,14 @@ type TaskResult struct {
 	createdAt  time.Time
 	taskID     int64
 	statusCode int
-	headers    map[string]interface{}
+	headers    map[string]string
 	length     int64
 }
 
 func NewTaskResult(
 	taskID int64,
 	statusCode int,
-	headers map[string]interface{},
+	headers map[string]string,
 	length int64,
 ) TaskResult {
 	return TaskResult{
@@ -40,7 +40,7 @@ func BuildTaskResult(
 	createdAt time.Time,
 	taskID int64,
 	statusCode int,
-	headers map[string]interface{},
+	headers map[string]string,
 	length int64,
 ) TaskResult {
 	return TaskResult{
@@ -69,7 +69,7 @@ func (tr TaskResult) StatusCode() int {
 	return tr.statusCode
 }
 
-func (tr TaskResult) Headers() map[string]interface{} {
+func (tr TaskResult) Headers() map[string]string {
 	return tr.headers
 }
 

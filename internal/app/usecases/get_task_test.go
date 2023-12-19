@@ -11,6 +11,7 @@ import (
 	"RequestTasker/internal/domian/common"
 	"RequestTasker/internal/domian/entities"
 	"RequestTasker/internal/mocks"
+	"RequestTasker/internal/pkg/test"
 
 	. "github.com/smartystreets/goconvey/convey"
 )
@@ -32,7 +33,7 @@ func TestGetTaskUseCase_Execute(t *testing.T) {
 		)
 
 		expectedErr := errors.New("expectedErr")
-		newTask := entities.NewTask("url", "method", nil, nil)
+		newTask := test.NewTestTask()
 		expectedTask := entities.BuildTask(
 			rand.Int63(),
 			newTask.CreatedAt(),
@@ -50,7 +51,7 @@ func TestGetTaskUseCase_Execute(t *testing.T) {
 				Return(nil, expectedErr)
 
 			_, _, _, err := getTaskUseCase.Execute(ctx, expectedTask.PublicID())
-			So(err, ShouldEqual, common.InternalError)
+			So(err, ShouldEqual, common.ErrInternal)
 		})
 
 		Convey("When taskRepository.GetByPublicID() works", func() {
@@ -64,7 +65,7 @@ func TestGetTaskUseCase_Execute(t *testing.T) {
 					Return(&expectedStatus, expectedErr)
 
 				_, _, _, err := getTaskUseCase.Execute(ctx, expectedTask.PublicID())
-				So(err, ShouldEqual, common.InternalError)
+				So(err, ShouldEqual, common.ErrInternal)
 			})
 
 			Convey("When taskStatusRepository.GetLatestByTaskID() returns status without result", func() {
@@ -96,7 +97,7 @@ func TestGetTaskUseCase_Execute(t *testing.T) {
 						Return(nil, expectedErr)
 
 					_, _, _, err := getTaskUseCase.Execute(ctx, expectedTask.PublicID())
-					So(err, ShouldEqual, common.InternalError)
+					So(err, ShouldEqual, common.ErrInternal)
 				})
 
 				Convey("When taskResultRepository.GetByTaskID() works", func() {

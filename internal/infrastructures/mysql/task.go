@@ -25,15 +25,9 @@ type TaskRow struct {
 }
 
 func (r *TaskRow) ConvertToEntity() (*entities.Task, error) {
-	headers := make(map[string]interface{})
-	body := make(map[string]interface{})
+	headers := make(map[string]string)
 
 	err := json.Unmarshal([]byte(r.Headers), &headers)
-	if err != nil {
-		return nil, err
-	}
-
-	err = json.Unmarshal([]byte(r.Body), &body)
 	if err != nil {
 		return nil, err
 	}
@@ -50,7 +44,7 @@ func (r *TaskRow) ConvertToEntity() (*entities.Task, error) {
 		r.Url,
 		r.Method,
 		headers,
-		body,
+		r.Body,
 	)
 
 	return &task, nil
@@ -74,11 +68,6 @@ func (r *TaskRepository) Create(ctx context.Context, task entities.Task) (*entit
 		return nil, err
 	}
 
-	body, err := json.Marshal(task.Body())
-	if err != nil {
-		return nil, err
-	}
-
 	result, err := r.session.InsertInto(r.tableName).
 		Columns(
 			"public_id",
@@ -92,7 +81,7 @@ func (r *TaskRepository) Create(ctx context.Context, task entities.Task) (*entit
 			task.Url(),
 			task.Method(),
 			string(headers),
-			string(body),
+			task.Body(),
 		).
 		ExecContext(ctx)
 
@@ -129,7 +118,7 @@ func (r *TaskRepository) GetByPublicID(ctx context.Context, publicID uuid.UUID) 
 
 	switch {
 	case err == dbr.ErrNotFound:
-		return nil, common.NotFoundError
+		return nil, common.ErrNotFound
 	case err != nil:
 		return nil, fmt.Errorf("failed to GetByPublicID: %w", err)
 	}

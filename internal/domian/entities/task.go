@@ -11,6 +11,7 @@ import (
 type TaskRepository interface {
 	Create(ctx context.Context, task Task) (*Task, error)
 	GetByPublicID(ctx context.Context, publicId uuid.UUID) (*Task, error)
+	Get(ctx context.Context, taskID int64) (*Task, error)
 }
 
 type Task struct {
@@ -20,15 +21,15 @@ type Task struct {
 
 	url     string
 	method  string
-	headers map[string]interface{}
-	body    map[string]interface{}
+	headers map[string]string
+	body    string
 }
 
 func NewTask(
 	url string,
 	method string,
-	headers map[string]interface{},
-	body map[string]interface{},
+	headers map[string]string,
+	body string,
 ) Task {
 	return Task{
 		createdAt: time.Now(),
@@ -46,8 +47,8 @@ func BuildTask(
 	publicID uuid.UUID,
 	url string,
 	method string,
-	headers map[string]interface{},
-	body map[string]interface{},
+	headers map[string]string,
+	body string,
 ) Task {
 	return Task{
 		id:        id,
@@ -80,10 +81,10 @@ func (t Task) Method() string {
 	return t.method
 }
 
-func (t Task) Headers() map[string]interface{} {
+func (t Task) Headers() map[string]string {
 	return t.headers
 }
 
-func (t Task) Body() map[string]interface{} {
+func (t Task) Body() string {
 	return t.body
 }

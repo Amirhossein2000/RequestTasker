@@ -4,6 +4,7 @@ import (
 	"RequestTasker/internal/domian/common"
 	"RequestTasker/internal/domian/entities"
 	"RequestTasker/internal/pkg/integration"
+	"RequestTasker/internal/pkg/test"
 	"context"
 	"testing"
 
@@ -20,12 +21,7 @@ func TestTaskStatusRepository(t *testing.T) {
 
 		repo := NewTaskStatusRepository(session, common.TaskStatusTable)
 
-		task := entities.NewTask(
-			"https://example.com",
-			"GET",
-			map[string]interface{}{"Authorization": "Bearer token"},
-			map[string]interface{}{"key": "value"},
-		)
+		task := test.NewTestTask()
 		taskRepo := NewTaskRepository(session, common.TaskTable)
 		createdTask, err := taskRepo.Create(context.Background(), task)
 		So(err, ShouldBeNil)

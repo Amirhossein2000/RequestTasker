@@ -21,7 +21,7 @@ type TaskResultRow struct {
 }
 
 func (r *TaskResultRow) ConvertToEntity() (*entities.TaskResult, error) {
-	headers := make(map[string]interface{})
+	headers := make(map[string]string)
 	err := json.Unmarshal([]byte(r.Headers), &headers)
 	if err != nil {
 		return nil, err
@@ -104,7 +104,7 @@ func (r *TaskResultRepository) GetByTaskID(ctx context.Context, taskID int64) (*
 
 	switch {
 	case err == dbr.ErrNotFound:
-		return nil, common.NotFoundError
+		return nil, common.ErrNotFound
 	case err != nil:
 		return nil, fmt.Errorf("failed to GetByTaskID: %w", err)
 	}

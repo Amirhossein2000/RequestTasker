@@ -82,7 +82,7 @@ func (r *TaskStatusRepository) GetLatestByTaskID(ctx context.Context, taskID int
 
 	switch {
 	case err == dbr.ErrNotFound:
-		return nil, common.NotFoundError
+		return nil, common.ErrNotFound
 	case err != nil:
 		return nil, fmt.Errorf("failed to GetLatestByTaskID: %w", err)
 	}

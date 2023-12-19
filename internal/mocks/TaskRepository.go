@@ -46,6 +46,36 @@ func (_m *TaskRepositoryMock) Create(ctx context.Context, task entities.Task) (*
 	return r0, r1
 }
 
+// Get provides a mock function with given fields: ctx, taskID
+func (_m *TaskRepositoryMock) Get(ctx context.Context, taskID int64) (*entities.Task, error) {
+	ret := _m.Called(ctx, taskID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Get")
+	}
+
+	var r0 *entities.Task
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, int64) (*entities.Task, error)); ok {
+		return rf(ctx, taskID)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, int64) *entities.Task); ok {
+		r0 = rf(ctx, taskID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*entities.Task)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, int64) error); ok {
+		r1 = rf(ctx, taskID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // GetByPublicID provides a mock function with given fields: ctx, publicId
 func (_m *TaskRepositoryMock) GetByPublicID(ctx context.Context, publicId uuid.UUID) (*entities.Task, error) {
 	ret := _m.Called(ctx, publicId)

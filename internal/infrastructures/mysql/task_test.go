@@ -2,8 +2,8 @@ package mysql
 
 import (
 	"RequestTasker/internal/domian/common"
-	"RequestTasker/internal/domian/entities"
 	"RequestTasker/internal/pkg/integration"
+	"RequestTasker/internal/pkg/test"
 	"context"
 	"testing"
 
@@ -20,12 +20,7 @@ func TestTaskRepository(t *testing.T) {
 
 		repo := NewTaskRepository(session, common.TaskTable)
 
-		task := entities.NewTask(
-			"https://example.com",
-			"GET",
-			map[string]interface{}{"Authorization": "Bearer token"},
-			map[string]interface{}{"key": "value"},
-		)
+		task := test.NewTestTask()
 
 		Convey("Insert new task and check created task", func() {
 			createdTask, err := repo.Create(context.Background(), task)
@@ -41,11 +36,11 @@ func TestTaskRepository(t *testing.T) {
 				foundTask, err := repo.GetByPublicID(context.Background(), createdTask.PublicID())
 				So(err, ShouldBeNil)
 
-				So(createdTask.PublicID(), ShouldEqual, foundTask.PublicID())
-				So(createdTask.Url(), ShouldEqual, foundTask.Url())
-				So(createdTask.Method(), ShouldEqual, foundTask.Method())
-				So(createdTask.Headers(), ShouldEqual, foundTask.Headers())
-				So(createdTask.Body(), ShouldEqual, foundTask.Body())
+				So(foundTask.PublicID(), ShouldEqual, createdTask.PublicID())
+				So(foundTask.Url(), ShouldEqual, createdTask.Url())
+				So(foundTask.Method(), ShouldEqual, createdTask.Method())
+				So(foundTask.Headers(), ShouldEqual, createdTask.Headers())
+				So(foundTask.Body(), ShouldEqual, createdTask.Body())
 			})
 		})
 	})
