@@ -1,0 +1,4 @@
+ALTER TABLE
+    tasks
+MODIFY
+    COLUMN method VARCHAR(10);
