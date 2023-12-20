@@ -74,6 +74,8 @@ paths:
                   id:
                     type: string
                     description: Generated unique ID for the task
+                required:
+                  - id
         "400":
           description: Bad Request
         "401":

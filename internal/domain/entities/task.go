@@ -34,7 +34,7 @@ func NewTask(
 	return Task{
 		createdAt: time.Now(),
 		publicID:  uuid.New(),
-		url:       url,
+		url:       url, // TODO Should I check url validation here is it's already implemented by code-gen?
 		method:    method,
 		headers:   headers,
 		body:      body,

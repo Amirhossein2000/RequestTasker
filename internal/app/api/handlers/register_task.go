@@ -2,32 +2,37 @@ package handlers
 
 import (
 	"RequestTasker/internal/app/api"
-	"RequestTasker/internal/domain/common"
 	"RequestTasker/internal/domain/entities"
 	"context"
 	"fmt"
-
-	"github.com/samber/lo"
 )
 
 func (h *Handler) PostTask(ctx context.Context, request api.PostTaskRequestObject) (api.PostTaskResponseObject, error) {
-	task := entities.NewTask( //TODO: handle bad request in this func
+	headers := make(map[string]string)
+	body := ""
+
+	if request.Body.Headers != nil {
+		headers = convertHeadersForRequest(*request.Body.Headers)
+	}
+
+	if request.Body.Body != nil {
+		body = *request.Body.Body
+	}
+
+	task := entities.NewTask(
 		request.Body.Url,
 		string(request.Body.Method),
-		convertHeadersForRequest(*request.Body.Headers),
-		*request.Body.Body,
+		headers,
+		body,
 	)
 
 	publicId, err := h.createTaskUseCase.Execute(ctx, task)
 	if err != nil {
-		switch err {
-		case common.ErrInternal:
-			return api.PostTask500Response{}, nil
-		}
+		return api.PostTask500Response{}, nil
 	}
 
 	return api.PostTask201JSONResponse{
-		Id: lo.ToPtr(publicId.String()),
+		Id: publicId.String(),
 	}, nil
 }
 
