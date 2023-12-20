@@ -31,12 +31,14 @@ func NewTasker(
 	taskRepository entities.TaskRepository,
 	taskStatusRepository entities.TaskStatusRepository,
 	taskResultRepository entities.TaskResultRepository,
+	httpClient *http.Client,
 ) *Tasker {
 	return &Tasker{
 		taskEventRepository:  taskEventRepository,
 		taskRepository:       taskRepository,
 		taskStatusRepository: taskStatusRepository,
 		taskResultRepository: taskResultRepository,
+		httpClient:           httpClient,
 		in:                   make(chan int64, 128),
 		out:                  make(chan int64, 128),
 	}
