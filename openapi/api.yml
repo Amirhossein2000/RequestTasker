@@ -26,11 +26,32 @@ components:
           type: object
           description: Headers for the HTTP request
         body:
-          type: object
+          type: string
           description: Request body payload
       required:
         - method
         - url
+
+    GetTaskResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique ID of the task
+        status:
+          $ref: "#/components/schemas/TaskStatus"
+        httpStatusCode:
+          type: integer
+          description: HTTP status code of the 3rd-party service response
+        headers:
+          type: object
+          description: Headers array from 3rd-party service response
+        length:
+          type: integer
+          description: Content length of 3rd-party service response
+      required:
+        - id
+        - status
 
 paths:
   /task:
@@ -55,34 +76,10 @@ paths:
                     description: Generated unique ID for the task
         "400":
           description: Bad Request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    description: Invalid request payload
         "401":
           description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    description: Unauthorized access. Please provide valid credentials.
         "500":
           description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    description: An error occurred while processing the request
 
   /task/{id}:
     get:
@@ -100,49 +97,12 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  id:
-                    type: string
-                    description: Unique ID of the task
-                  status:
-                    $ref: "#/components/schemas/TaskStatus"
-                  httpStatusCode:
-                    type: integer
-                    description: HTTP status code of the 3rd-party service response
-                  headers:
-                    type: object
-                    description: Headers array from 3rd-party service response
-                  length:
-                    type: integer
-                    description: Content length of 3rd-party service response
+                $ref: "#/components/schemas/GetTaskResponse"
+        "400":
+          description: Bad Request
         "401":
           description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    description: Unauthorized access. Please provide valid credentials.
         "404":
           description: Not Found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    description: Task not found with the given ID
         "500":
           description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    description: An error occurred while processing the request

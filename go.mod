@@ -7,6 +7,7 @@ require (
 	github.com/google/uuid v1.4.0
 	github.com/labstack/echo/v4 v4.11.3
 	github.com/oapi-codegen/runtime v1.1.0
+	github.com/samber/lo v1.39.0
 	github.com/stretchr/testify v1.8.4
 	github.com/testcontainers/testcontainers-go/modules/kafka v0.26.0
 )

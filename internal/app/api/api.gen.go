@@ -40,13 +40,29 @@ const (
 	New       TaskStatus = "new"
 )
 
+// GetTaskResponse defines model for GetTaskResponse.
+type GetTaskResponse struct {
+	// Headers Headers array from 3rd-party service response
+	Headers *map[string]interface{} `json:"headers,omitempty"`
+
+	// HttpStatusCode HTTP status code of the 3rd-party service response
+	HttpStatusCode *int `json:"httpStatusCode,omitempty"`
+
+	// Id Unique ID of the task
+	Id string `json:"id"`
+
+	// Length Content length of 3rd-party service response
+	Length *int       `json:"length,omitempty"`
+	Status TaskStatus `json:"status"`
+}
+
 // HttpMethod defines model for HttpMethod.
 type HttpMethod string
 
 // TaskRequest defines model for TaskRequest.
 type TaskRequest struct {
 	// Body Request body payload
-	Body *map[string]interface{} `json:"body,omitempty"`
+	Body *string `json:"body,omitempty"`
 
 	// Headers Headers for the HTTP request
 	Headers *map[string]interface{} `json:"headers,omitempty"`
@@ -155,40 +171,28 @@ func (response PostTask201JSONResponse) VisitPostTaskResponse(w http.ResponseWri
 	return json.NewEncoder(w).Encode(response)
 }
 
-type PostTask400JSONResponse struct {
-	// Message Invalid request payload
-	Message *string `json:"message,omitempty"`
+type PostTask400Response struct {
 }
 
-func (response PostTask400JSONResponse) VisitPostTaskResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
+func (response PostTask400Response) VisitPostTaskResponse(w http.ResponseWriter) error {
 	w.WriteHeader(400)
-
-	return json.NewEncoder(w).Encode(response)
+	return nil
 }
 
-type PostTask401JSONResponse struct {
-	// Message Unauthorized access. Please provide valid credentials.
-	Message *string `json:"message,omitempty"`
+type PostTask401Response struct {
 }
 
-func (response PostTask401JSONResponse) VisitPostTaskResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
+func (response PostTask401Response) VisitPostTaskResponse(w http.ResponseWriter) error {
 	w.WriteHeader(401)
-
-	return json.NewEncoder(w).Encode(response)
+	return nil
 }
 
-type PostTask500JSONResponse struct {
-	// Message An error occurred while processing the request
-	Message *string `json:"message,omitempty"`
+type PostTask500Response struct {
 }
 
-func (response PostTask500JSONResponse) VisitPostTaskResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
+func (response PostTask500Response) VisitPostTaskResponse(w http.ResponseWriter) error {
 	w.WriteHeader(500)
-
-	return json.NewEncoder(w).Encode(response)
+	return nil
 }
 
 type GetTaskIdRequestObject struct {
@@ -199,20 +203,7 @@ type GetTaskIdResponseObject interface {
 	VisitGetTaskIdResponse(w http.ResponseWriter) error
 }
 
-type GetTaskId200JSONResponse struct {
-	// Headers Headers array from 3rd-party service response
-	Headers *map[string]interface{} `json:"headers,omitempty"`
-
-	// HttpStatusCode HTTP status code of the 3rd-party service response
-	HttpStatusCode *int `json:"httpStatusCode,omitempty"`
-
-	// Id Unique ID of the task
-	Id *string `json:"id,omitempty"`
-
-	// Length Content length of 3rd-party service response
-	Length *int        `json:"length,omitempty"`
-	Status *TaskStatus `json:"status,omitempty"`
-}
+type GetTaskId200JSONResponse GetTaskResponse
 
 func (response GetTaskId200JSONResponse) VisitGetTaskIdResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -221,40 +212,36 @@ func (response GetTaskId200JSONResponse) VisitGetTaskIdResponse(w http.ResponseW
 	return json.NewEncoder(w).Encode(response)
 }
 
-type GetTaskId401JSONResponse struct {
-	// Message Unauthorized access. Please provide valid credentials.
-	Message *string `json:"message,omitempty"`
+type GetTaskId400Response struct {
 }
 
-func (response GetTaskId401JSONResponse) VisitGetTaskIdResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
+func (response GetTaskId400Response) VisitGetTaskIdResponse(w http.ResponseWriter) error {
+	w.WriteHeader(400)
+	return nil
+}
+
+type GetTaskId401Response struct {
+}
+
+func (response GetTaskId401Response) VisitGetTaskIdResponse(w http.ResponseWriter) error {
 	w.WriteHeader(401)
-
-	return json.NewEncoder(w).Encode(response)
+	return nil
 }
 
-type GetTaskId404JSONResponse struct {
-	// Message Task not found with the given ID
-	Message *string `json:"message,omitempty"`
+type GetTaskId404Response struct {
 }
 
-func (response GetTaskId404JSONResponse) VisitGetTaskIdResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
+func (response GetTaskId404Response) VisitGetTaskIdResponse(w http.ResponseWriter) error {
 	w.WriteHeader(404)
-
-	return json.NewEncoder(w).Encode(response)
+	return nil
 }
 
-type GetTaskId500JSONResponse struct {
-	// Message An error occurred while processing the request
-	Message *string `json:"message,omitempty"`
+type GetTaskId500Response struct {
 }
 
-func (response GetTaskId500JSONResponse) VisitGetTaskIdResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
+func (response GetTaskId500Response) VisitGetTaskIdResponse(w http.ResponseWriter) error {
 	w.WriteHeader(500)
-
-	return json.NewEncoder(w).Encode(response)
+	return nil
 }
 
 // StrictServerInterface represents all server handlers.
@@ -336,20 +323,19 @@ func (sh *strictHandler) GetTaskId(ctx echo.Context, id string) error {
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
+	"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",
+	"AP//q9dF2GQIAAA=",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file
