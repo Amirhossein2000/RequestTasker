@@ -24,6 +24,8 @@ type Tasker struct {
 	httpClient           *http.Client
 	in                   chan int64
 	out                  chan int64
+
+	// TODO logger
 }
 
 func NewTasker(

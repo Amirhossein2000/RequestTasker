@@ -20,7 +20,7 @@ type Task struct {
 	publicID  uuid.UUID
 
 	url     string
-	method  string
+	method  string // TODO: make this enum
 	headers map[string]string
 	body    string
 }
