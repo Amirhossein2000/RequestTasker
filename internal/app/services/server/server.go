@@ -8,21 +8,26 @@ import (
 )
 
 type Server struct {
-	Addr     string
-	Handlers api.StrictServerInterface
+	Addr        string
+	Handlers    api.StrictServerInterface
+	Middlewares []api.StrictMiddlewareFunc
 }
 
-func NewServer(addr string, handlers api.StrictServerInterface) *Server {
+func NewServer(
+	addr string,
+	handlers api.StrictServerInterface,
+	Middlewares []api.StrictMiddlewareFunc,
+) *Server {
 	return &Server{
-		Addr:     addr,
-		Handlers: handlers,
+		Addr:        addr,
+		Handlers:    handlers,
+		Middlewares: Middlewares,
 	}
 }
 
 func (s *Server) Start() error {
-	// TODO: Auth middleware
 	e := echo.New()
-	handlers := api.NewStrictHandler(s.Handlers, nil)
+	handlers := api.NewStrictHandler(s.Handlers, s.Middlewares)
 	api.RegisterHandlers(e, handlers)
 	return e.Start(s.Addr)
 }
