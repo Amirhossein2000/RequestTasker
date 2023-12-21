@@ -3,6 +3,8 @@ package integration
 import (
 	"context"
 	"fmt"
+	"path/filepath"
+	"runtime"
 	"sync/atomic"
 	"time"
 
@@ -79,8 +81,11 @@ func SetupMySQLContainer() (*dbr.Session, func(), error) {
 		return nil, nil, err
 	}
 
+	_, currentFile, _, _ := runtime.Caller(0)
+	migrationsPath := filepath.Join(filepath.Dir(currentFile), "../../../migrations")
+
 	m, err := migrate.NewWithDatabaseInstance(
-		"file:../../../migrations",
+		"file:"+migrationsPath,
 		"mysql", driver,
 	)
 	if err != nil {
