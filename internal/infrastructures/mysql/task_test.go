@@ -1,11 +1,12 @@
 package mysql
 
 import (
-	"RequestTasker/internal/domain/common"
-	"RequestTasker/internal/pkg/integration"
-	"RequestTasker/internal/pkg/test"
 	"context"
 	"testing"
+
+	"github.com/Amirhossein2000/RequestTasker/internal/domain/common"
+	"github.com/Amirhossein2000/RequestTasker/internal/pkg/integration"
+	"github.com/Amirhossein2000/RequestTasker/internal/pkg/test"
 
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/golang-migrate/migrate/v4/source/file"

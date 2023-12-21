@@ -7,11 +7,11 @@ import (
 	"testing"
 	"time"
 
-	"RequestTasker/internal/app/services/logger"
-	"RequestTasker/internal/domain/common"
-	"RequestTasker/internal/domain/entities"
-	"RequestTasker/internal/mocks"
-	"RequestTasker/internal/pkg/test"
+	"github.com/Amirhossein2000/RequestTasker/internal/app/services/logger"
+	"github.com/Amirhossein2000/RequestTasker/internal/domain/common"
+	"github.com/Amirhossein2000/RequestTasker/internal/domain/entities"
+	"github.com/Amirhossein2000/RequestTasker/internal/mocks"
+	"github.com/Amirhossein2000/RequestTasker/internal/pkg/test"
 
 	. "github.com/smartystreets/goconvey/convey"
 )

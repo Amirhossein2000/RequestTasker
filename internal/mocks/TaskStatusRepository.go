@@ -3,9 +3,9 @@
 package mocks
 
 import (
-	entities "RequestTasker/internal/domain/entities"
 	context "context"
 
+	entities "github.com/Amirhossein2000/RequestTasker/internal/domain/entities"
 	mock "github.com/stretchr/testify/mock"
 )
 

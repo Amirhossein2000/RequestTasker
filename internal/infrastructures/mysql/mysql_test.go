@@ -2,10 +2,11 @@
 package mysql
 
 import (
-	"RequestTasker/internal/pkg/integration"
 	"log"
 	"os"
 	"testing"
+
+	"github.com/Amirhossein2000/RequestTasker/internal/pkg/integration"
 )
 
 func TestMain(m *testing.M) {

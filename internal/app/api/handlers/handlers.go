@@ -1,6 +1,6 @@
 package handlers
 
-import "RequestTasker/internal/app/usecases"
+import "github.com/Amirhossein2000/RequestTasker/internal/app/usecases"
 
 type Handler struct {
 	apiKey            string

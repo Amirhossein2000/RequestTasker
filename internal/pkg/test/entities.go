@@ -1,6 +1,6 @@
 package test
 
-import "RequestTasker/internal/domain/entities"
+import "github.com/Amirhossein2000/RequestTasker/internal/domain/entities"
 
 func NewTestTask() entities.Task {
 	return entities.NewTask(

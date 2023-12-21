@@ -1,9 +1,9 @@
 package usecases
 
 import (
-	"RequestTasker/internal/app/services/logger"
-	"RequestTasker/internal/domain/common"
-	"RequestTasker/internal/domain/entities"
+	"github.com/Amirhossein2000/RequestTasker/internal/app/services/logger"
+	"github.com/Amirhossein2000/RequestTasker/internal/domain/common"
+	"github.com/Amirhossein2000/RequestTasker/internal/domain/entities"
 	"context"
 
 	"github.com/google/uuid"
@@ -25,13 +25,13 @@ func NewCreateTaskUseCase(
 	logger logger.Logger,
 	taskRepository entities.TaskRepository,
 	taskStatusRepository entities.TaskStatusRepository,
-	requestTasker Tasker,
+	tasker Tasker,
 ) CreateTaskUseCase {
 	return CreateTaskUseCase{
 		logger:               logger,
 		taskRepository:       taskRepository,
 		taskStatusRepository: taskStatusRepository,
-		tasker:               requestTasker,
+		tasker:               tasker,
 	}
 }
 

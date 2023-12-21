@@ -1,10 +1,11 @@
 package handlers
 
 import (
-	"RequestTasker/internal/app/api"
-	"RequestTasker/internal/domain/entities"
 	"context"
 	"fmt"
+
+	"github.com/Amirhossein2000/RequestTasker/internal/app/api"
+	"github.com/Amirhossein2000/RequestTasker/internal/domain/entities"
 )
 
 func (h *Handler) PostTask(ctx context.Context, request api.PostTaskRequestObject) (api.PostTaskResponseObject, error) {

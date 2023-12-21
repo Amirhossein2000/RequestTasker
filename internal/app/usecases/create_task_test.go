@@ -7,11 +7,11 @@ import (
 	"testing"
 	"time"
 
-	"RequestTasker/internal/app/services/logger"
-	"RequestTasker/internal/domain/common"
-	"RequestTasker/internal/domain/entities"
-	"RequestTasker/internal/mocks"
-	"RequestTasker/internal/pkg/test"
+	"github.com/Amirhossein2000/RequestTasker/internal/app/services/logger"
+	"github.com/Amirhossein2000/RequestTasker/internal/domain/common"
+	"github.com/Amirhossein2000/RequestTasker/internal/domain/entities"
+	"github.com/Amirhossein2000/RequestTasker/internal/mocks"
+	"github.com/Amirhossein2000/RequestTasker/internal/pkg/test"
 
 	. "github.com/smartystreets/goconvey/convey"
 )
@@ -24,12 +24,12 @@ func TestCreateTaskUseCase_Execute(t *testing.T) {
 		logger := logger.NewLogger()
 		taskRepository := mocks.NewTaskRepositoryMock(t)
 		taskStatusRepository := mocks.NewTaskStatusRepositoryMock(t)
-		requestTasker := mocks.NewTaskerMock(t)
+		tasker := mocks.NewTaskerMock(t)
 		createTaskUseCase := NewCreateTaskUseCase(
 			logger,
 			taskRepository,
 			taskStatusRepository,
-			requestTasker,
+			tasker,
 		)
 
 		expectedErr := errors.New("expectedErr")
@@ -73,8 +73,8 @@ func TestCreateTaskUseCase_Execute(t *testing.T) {
 					On("Create", ctx, expectedStatus).
 					Return(&expectedStatus, nil)
 
-				Convey("When requestTasker.RegisterTask() returns error", func() {
-					requestTasker.
+				Convey("When tasker.RegisterTask() returns error", func() {
+					tasker.
 						On("RegisterTask", ctx, expectedTask).
 						Return(expectedErr)
 
@@ -82,8 +82,8 @@ func TestCreateTaskUseCase_Execute(t *testing.T) {
 					So(err, ShouldEqual, common.ErrInternal)
 				})
 
-				Convey("When requestTasker.RegisterTask() works", func() {
-					requestTasker.
+				Convey("When tasker.RegisterTask() works", func() {
+					tasker.
 						On("RegisterTask", ctx, expectedTask).
 						Return(nil)
 

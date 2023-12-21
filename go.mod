@@ -1,4 +1,4 @@
-module RequestTasker
+module github.com/Amirhossein2000/RequestTasker
 
 go 1.21.5
 

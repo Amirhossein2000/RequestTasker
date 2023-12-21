@@ -1,10 +1,11 @@
 package entities
 
 import (
-	"RequestTasker/internal/domain/common"
 	"context"
 	"slices"
 	"time"
+
+	"github.com/Amirhossein2000/RequestTasker/internal/domain/common"
 )
 
 //go:generate mockery --name TaskStatusRepository --structname TaskStatusRepositoryMock --output ../../mocks/

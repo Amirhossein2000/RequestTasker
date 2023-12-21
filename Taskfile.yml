@@ -12,13 +12,13 @@ tasks:
     - go build -o ./bin ./cmd/
   test-db:
     cmds:
-    - go test -v -count=1 RequestTasker/internal/infrastructures/mysql
+    - go test -v -count=1 github.com/Amirhossein2000/RequestTasker/internal/infrastructures/mysql
   test-usecase:
     cmds:
-    - go test -v -count=1 RequestTasker/internal/app/usecases
+    - go test -v -count=1 github.com/Amirhossein2000/RequestTasker/internal/app/usecases
   test-kafka:
     cmds:
-    - go test -v -count=1 RequestTasker/internal/infrastructures/kafka
+    - go test -v -count=1 github.com/Amirhossein2000/RequestTasker/internal/infrastructures/kafka
   test:
     - task: test-db
     - task: test-usecase

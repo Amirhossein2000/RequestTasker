@@ -1,12 +1,13 @@
 package kafka
 
 import (
-	"RequestTasker/internal/domain/dto"
-	"RequestTasker/internal/pkg/integration"
 	"context"
 	"math/rand"
 	"testing"
 	"time"
+
+	"github.com/Amirhossein2000/RequestTasker/internal/domain/dto"
+	"github.com/Amirhossein2000/RequestTasker/internal/pkg/integration"
 
 	. "github.com/smartystreets/goconvey/convey"
 )

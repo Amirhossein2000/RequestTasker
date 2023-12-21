@@ -1,13 +1,14 @@
 package tasker
 
 import (
-	"RequestTasker/internal/domain/common"
-	"RequestTasker/internal/domain/dto"
-	"RequestTasker/internal/domain/entities"
 	"bytes"
 	"context"
 	"net/http"
 	"strings"
+
+	"github.com/Amirhossein2000/RequestTasker/internal/domain/common"
+	"github.com/Amirhossein2000/RequestTasker/internal/domain/dto"
+	"github.com/Amirhossein2000/RequestTasker/internal/domain/entities"
 )
 
 //go:generate mockery --name TaskEventRepository --structname TaskEventRepositoryMock --output ../../../mocks/
