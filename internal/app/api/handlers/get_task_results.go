@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"errors"
 
 	"github.com/Amirhossein2000/RequestTasker/internal/app/api"
 	"github.com/Amirhossein2000/RequestTasker/internal/domain/common"
@@ -11,9 +12,11 @@ import (
 )
 
 func (h *Handler) GetTaskId(ctx context.Context, request api.GetTaskIdRequestObject) (api.GetTaskIdResponseObject, error) {
-	publicId, err := uuid.Parse(request.Id)
+	publicId, err := validateGetTaskIdRequestObject(request)
 	if err != nil {
-		return api.GetTaskId400Response{}, nil
+		return api.GetTaskId400JSONResponse{
+			Message: err.Error(),
+		}, nil
 	}
 
 	task, taskStatus, taskResult, err := h.getTaskUseCase.Execute(ctx, publicId)
@@ -49,4 +52,13 @@ func convertHeadersForResponse(headers map[string]string) map[string]interface{}
 	}
 
 	return result
+}
+
+func validateGetTaskIdRequestObject(request api.GetTaskIdRequestObject) (uuid.UUID, error) {
+	publicId, err := uuid.Parse(request.Id)
+	if err != nil {
+		return uuid.Nil, errors.New("invalid id format")
+	}
+
+	return publicId, nil
 }

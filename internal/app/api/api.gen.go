@@ -59,6 +59,12 @@ type GetTaskResponse struct {
 // HttpMethod defines model for HttpMethod.
 type HttpMethod string
 
+// InvalidRequestPayload defines model for InvalidRequestPayload.
+type InvalidRequestPayload struct {
+	// Message Invalid request payload
+	Message string `json:"message"`
+}
+
 // TaskRequest defines model for TaskRequest.
 type TaskRequest struct {
 	// Body Request body payload
@@ -171,12 +177,13 @@ func (response PostTask201JSONResponse) VisitPostTaskResponse(w http.ResponseWri
 	return json.NewEncoder(w).Encode(response)
 }
 
-type PostTask400Response struct {
-}
+type PostTask400JSONResponse InvalidRequestPayload
 
-func (response PostTask400Response) VisitPostTaskResponse(w http.ResponseWriter) error {
+func (response PostTask400JSONResponse) VisitPostTaskResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(400)
-	return nil
+
+	return json.NewEncoder(w).Encode(response)
 }
 
 type PostTask401Response struct {
@@ -212,12 +219,13 @@ func (response GetTaskId200JSONResponse) VisitGetTaskIdResponse(w http.ResponseW
 	return json.NewEncoder(w).Encode(response)
 }
 
-type GetTaskId400Response struct {
-}
+type GetTaskId400JSONResponse InvalidRequestPayload
 
-func (response GetTaskId400Response) VisitGetTaskIdResponse(w http.ResponseWriter) error {
+func (response GetTaskId400JSONResponse) VisitGetTaskIdResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(400)
-	return nil
+
+	return json.NewEncoder(w).Encode(response)
 }
 
 type GetTaskId401Response struct {
@@ -323,19 +331,19 @@ func (sh *strictHandler) GetTaskId(ctx echo.Context, id string) error {
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"H4sIAAAAAAAC/6xVTXPbNhD9K5htj2wkN+6Ft8RWJU3TSBMpp0ymAxMrEbYIwIulPaqH/72zoL4ssq09",
-	"8cWmiMXb3ffeLp+g8FXwDh1HyJ8gFiVWOj2OkZc63n3BGLyLKK8C+YDEFlNAidogpUeDsSAb2HoHOUza",
-	"A6WJ9FatyFfqPZlfgibeqoj0YAtUtMfNgLcBIQd/c4sFQ5NByRwWrLmOV95gT4Llcq5iClCFN6j8SnGJ",
-	"L8piHeMaSdJY04X+6ux9jWp6vcdkHe+OtyOTdWu5vEG35rILcOUdo2PVngvKK6tq+xLgnwlXkMNPg6NG",
-	"g51AA5GmpQiaJgPC+9oSGsi/SVsHlO897E6Yw5/IpU/to6sruTUeLSGD+WyR/n2Vv9ejT6PlSH5+WF5N",
-	"IIPJ6MM1ZDCbL6ezz4sT8CMtrWXua4zcdcyNN9suY7twJacq6O3Ga9PH+P/6beUpSZbsQbsiegioDs3/",
-	"F8MnNDUZ1LTpMcuXT/9qPchg5anSDDnUZLsNnam2K6rN1CfbieInshnvJJV1fwXyBcYIGSCRJ8jA4WOP",
-	"RpLYupUXFLa8wf1ALZAekBKLx24WbTcC+4AU274v3g3fDaUmH9DpYCGH9+lVBkFzmQocpMERC/jWCmIE",
-	"LcRNDeQw9zGtF2hZwMgfd+Yo2gGSRx3Cxhbp0uA2Sur9hnrJeOxt2DynmqnG9KKdwVTsr8OLV6V+buu+",
-	"PTJGJ+2iUfVho+z92b9SulPcdYEEna0bQskiYlwOh906PmqjDkRIzEXfztM1l57s3y3Qb31AU8dITm/2",
-	"Nhklk0lBsa4qTdtDMUorh4+py9Ty6Tgq9j2jIijJL4MnaxrJvcYez+y+SFOTfEa6Qk774NtLl7iVQ3Go",
-	"DIeu0uI1cG6O7EToc42+d4wzfDPPnn9we9Se/fGmQl8OL7tBnz2r333tfswKY+TE/O4r7VdKtyo0TdP8",
-	"EwAA//8bOSaPdggAAA==",
+	"H4sIAAAAAAAC/9SWzXLbNhDHXwWz7ZGN5Ma96JbYqq1pGmss5ZTJdBBiJSIRAXixdEb18N07C5CyI9Kt",
+	"Ms0lF5sigP9+/XbBByh9HbxDxxFmDxDLCmudHq+Q1zp+vsUYvIsorwL5gMQW04YKtUFKjwZjSTaw9Q5m",
+	"cJ0XlCbSe7UhX6uXZH4JmnivItK9LVFRr1sA7wPCDPzHT1gytAVUzGHFmpt44Q2OGFivlyqmDar0BpXf",
+	"KK7wJCvWMW6RxIw1Q+l3zt41qBaXvSbr+PnxdGSybiuHd+i2XA0FLrxjdKzyuqh8o1c5LhH+mXADM/hp",
+	"8lijSVegiZQmpwjatgDCu8YSGpi9l7AOKh9GsnvNHP5ErnwKH11Ty6mr+RoKWN6s0r938vdy/ma+nsvP",
+	"V+uLayjgev7qEgq4Wa4XN29XT8Qf07Jw93pnzS3eNRh5qfc7r82QnRpj1NuR0nbnFWUBFTqFgamjoHvB",
+	"sYAzxklv6MlHb/ZDN7rtSlaf96H47x7YeEoYJWS7oMaQrw8F+beqPyldW0BDuxGAb9882w5QwMZTrRlm",
+	"0JA9IanJVLb0XGZXB157lIx3Ysq6vwL5EmOEApDIExTg8MsIN2LYuo0XFba8w77JV0j3SCmLj9GscjQi",
+	"e48Uc9xnL6YvpuKTD+h0sDCDl+lVAUFzlRycpGYWBHxGQUDQkriFgRksfUwjD3IWMPLrDo4yN7U86hB2",
+	"tkyHJp+imO6n5ikt22PYfp1qpgbTizwXkrO/Ts++yfTXWI/Ntit0Ei4a1RymXM/n+JgbTpYhBbLpaAQS",
+	"ihUpxvl0+t3yNz5aRuy/1kYdEi0+nI3Ned1w5cn+nR39LTt6PIwYyeldj+E8QSwGY1PXmvaHYJVWDr+k",
+	"LKaUPm13xX6kFUUl8Th5sKYV21scYbK7hRcmcUy6Rk7z5v2pF5eVRekAaT5dp8vGwDF8xZMaHDPwYQDm",
+	"96vp8UfGSDVv/vihQDqfng83vfWsfveN+3+oXSGnynZfPn6jdK5y27btPwEAAP//RlpguMoJAAA=",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

@@ -53,6 +53,15 @@ components:
         - id
         - status
 
+    InvalidRequestPayload:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Invalid request payload
+      required:
+        - message
+
 paths:
   /task:
     post:
@@ -78,6 +87,10 @@ paths:
                   - id
         "400":
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InvalidRequestPayload"
         "401":
           description: Unauthorized
         "500":
@@ -102,6 +115,10 @@ paths:
                 $ref: "#/components/schemas/GetTaskResponse"
         "400":
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InvalidRequestPayload"
         "401":
           description: Unauthorized
         "404":

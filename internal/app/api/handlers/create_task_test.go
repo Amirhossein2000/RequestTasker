@@ -18,6 +18,7 @@ import (
 	"github.com/Amirhossein2000/RequestTasker/internal/infrastructures/kafka"
 	"github.com/Amirhossein2000/RequestTasker/internal/infrastructures/mysql"
 	"github.com/Amirhossein2000/RequestTasker/internal/pkg/integration"
+	"github.com/labstack/gommon/random"
 	"github.com/samber/lo"
 	. "github.com/smartystreets/goconvey/convey"
 )
@@ -69,8 +70,10 @@ func TestPostTask(t *testing.T) {
 			taskResultRepository,
 		)
 
+		apiKey := random.String(32)
+
 		testHandler := NewHandler(
-			"API-Key",
+			apiKey,
 			createTaskUseCase,
 			getTaskUseCase,
 		)
@@ -85,6 +88,56 @@ func TestPostTask(t *testing.T) {
 		)
 		go testServer.Start()
 		defer testServer.Shutdown(context.Background())
+
+		Convey("return 400 when url is invalid", func() {
+			body := api.PostTaskJSONRequestBody{
+				Body: lo.ToPtr(`{"test":"test"}`),
+				Headers: &map[string]interface{}{
+					"test": "test",
+				},
+				Method: "GET",
+				Url:    "InvalidURL",
+			}
+
+			byteBody, err := json.Marshal(body)
+			So(err, ShouldBeNil)
+
+			rBody := bytes.NewBuffer(byteBody)
+			req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("http://%s/task", testServerAddr), rBody)
+			req.Header.Set("Content-Type", "application/json")
+			req.Header.Set("Authorization", apiKey)
+			So(err, ShouldBeNil)
+
+			resp, err := http.DefaultClient.Do(req)
+			So(err, ShouldBeNil)
+
+			So(resp.StatusCode, ShouldEqual, http.StatusBadRequest)
+		})
+
+		Convey("return 400 when method is invalid", func() {
+			body := api.PostTaskJSONRequestBody{
+				Body: lo.ToPtr(`{"test":"test"}`),
+				Headers: &map[string]interface{}{
+					"test": "test",
+				},
+				Method: "InvalidMethod",
+				Url:    "www.google.com",
+			}
+
+			byteBody, err := json.Marshal(body)
+			So(err, ShouldBeNil)
+
+			rBody := bytes.NewBuffer(byteBody)
+			req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("http://%s/task", testServerAddr), rBody)
+			req.Header.Set("Content-Type", "application/json")
+			req.Header.Set("Authorization", apiKey)
+			So(err, ShouldBeNil)
+
+			resp, err := http.DefaultClient.Do(req)
+			So(err, ShouldBeNil)
+
+			So(resp.StatusCode, ShouldEqual, http.StatusBadRequest)
+		})
 
 		Convey("return 401 when api-key is wrong", func() {
 			body := api.PostTaskJSONRequestBody{
@@ -109,5 +162,6 @@ func TestPostTask(t *testing.T) {
 
 			So(resp.StatusCode, ShouldEqual, http.StatusUnauthorized)
 		})
+
 	})
 }

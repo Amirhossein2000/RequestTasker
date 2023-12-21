@@ -2,13 +2,23 @@ package handlers
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"net/url"
+	"slices"
 
 	"github.com/Amirhossein2000/RequestTasker/internal/app/api"
 	"github.com/Amirhossein2000/RequestTasker/internal/domain/entities"
 )
 
 func (h *Handler) PostTask(ctx context.Context, request api.PostTaskRequestObject) (api.PostTaskResponseObject, error) {
+	err := validatePostTaskRequestObject(request)
+	if err != nil {
+		return api.PostTask400JSONResponse{
+			Message: err.Error(),
+		}, nil
+	}
+
 	headers := make(map[string]string)
 	body := ""
 
@@ -49,4 +59,27 @@ func convertHeadersForRequest(headers map[string]interface{}) map[string]string 
 	}
 
 	return result
+}
+
+func validatePostTaskRequestObject(request api.PostTaskRequestObject) error {
+	_, err := url.ParseRequestURI(request.Body.Url)
+	if err != nil {
+		return errors.New("url is invalid")
+	}
+
+	if !slices.Contains(methods, request.Body.Method) {
+		return errors.New("method is invalid")
+	}
+
+	return nil
+}
+
+var methods = []api.HttpMethod{
+	api.DELETE,
+	api.GET,
+	api.HEAD,
+	api.OPTIONS,
+	api.PATCH,
+	api.POST,
+	api.PUT,
 }
