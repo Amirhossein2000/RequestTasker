@@ -10,13 +10,13 @@ import (
 )
 
 func TestMain(m *testing.M) {
-	session, tearDown, err := integration.SetupMySQLContainer()
+	conn, tearDown, err := integration.SetupMySQLContainer()
 	if err != nil {
 		log.Panic(err)
 	}
 	defer tearDown()
 
-	err = session.Ping()
+	err = conn.Ping()
 	if err != nil {
 		log.Panic(err)
 	}

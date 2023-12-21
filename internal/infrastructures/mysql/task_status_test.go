@@ -16,14 +16,14 @@ import (
 
 func TestTaskStatusRepository(t *testing.T) {
 	Convey("TaskStatusRepository INSERT and SELECT queries", t, func() {
-		session, tearDown, err := integration.SetupMySQLContainer()
+		conn, tearDown, err := integration.SetupMySQLContainer()
 		So(err, ShouldBeNil)
 		defer tearDown()
 
-		repo := NewTaskStatusRepository(session, common.TaskStatusTable)
+		repo := NewTaskStatusRepository(conn.NewSession(nil), common.TaskStatusTable)
 
 		task := test.NewTestTask()
-		taskRepo := NewTaskRepository(session, common.TaskTable)
+		taskRepo := NewTaskRepository(conn.NewSession(nil), common.TaskTable)
 		createdTask, err := taskRepo.Create(context.Background(), task)
 		So(err, ShouldBeNil)
 

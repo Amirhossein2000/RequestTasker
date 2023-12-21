@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"path/filepath"
 	"runtime"
-	"sync/atomic"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -13,13 +12,13 @@ import (
 	"github.com/testcontainers/testcontainers-go"
 
 	"github.com/golang-migrate/migrate/v4"
-	"github.com/golang-migrate/migrate/v4/database/mysql"
+	migsql "github.com/golang-migrate/migrate/v4/database/mysql"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
+	"github.com/testcontainers/testcontainers-go/modules/mysql"
 )
 
 type testDB struct {
-	conn       *dbr.Connection
-	inUseCount int64
+	conn *dbr.Connection
 }
 
 var tb *testDB
@@ -27,41 +26,35 @@ var tb *testDB
 const databaseName = "test_db"
 
 // TODO: return conn
-func SetupMySQLContainer() (*dbr.Session, func(), error) {
+func SetupMySQLContainer() (*dbr.Connection, func(), error) {
 	if tb != nil {
-		atomic.AddInt64(&tb.inUseCount, 1)
-		return tb.conn.NewSession(nil),
-			func() {
-				atomic.AddInt64(&tb.inUseCount, -1)
-			},
-			nil
+		return tb.conn, func() {}, nil
 	}
 
 	ctx := context.Background()
 
-	req := testcontainers.ContainerRequest{
-		Image:        "mysql:latest",
-		ExposedPorts: []string{"3306/tcp"},
-		Env: map[string]string{
-			"MYSQL_ROOT_PASSWORD": "root",
-			"MYSQL_DATABASE":      databaseName,
-		},
-	}
-
-	mysqlC, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
-		ContainerRequest: req,
-		Started:          true,
-	})
+	mysqlContainer, err := mysql.RunContainer(ctx,
+		testcontainers.WithImage("mysql:latest"),
+		mysql.WithDatabase(databaseName),
+		mysql.WithUsername("root"),
+		mysql.WithPassword("root"),
+	)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	host, err := mysqlC.Host(ctx)
+	terminateFunc := func() {
+		if err := mysqlContainer.Terminate(ctx); err != nil {
+			panic(err)
+		}
+	}
+
+	host, err := mysqlContainer.Host(ctx)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	port, err := mysqlC.MappedPort(ctx, "3306")
+	port, err := mysqlContainer.MappedPort(ctx, "3306")
 	if err != nil {
 		return nil, nil, err
 	}
@@ -74,8 +67,8 @@ func SetupMySQLContainer() (*dbr.Session, func(), error) {
 		return nil, nil, err
 	}
 
-	driver, err := mysql.WithInstance(conn.DB, &mysql.Config{
-		MigrationsTable: mysql.DefaultMigrationsTable,
+	driver, err := migsql.WithInstance(conn.DB, &migsql.Config{
+		MigrationsTable: migsql.DefaultMigrationsTable,
 		DatabaseName:    databaseName,
 	})
 	if err != nil {
@@ -99,17 +92,8 @@ func SetupMySQLContainer() (*dbr.Session, func(), error) {
 	}
 
 	tb = &testDB{
-		conn:       conn,
-		inUseCount: 1,
+		conn: conn,
 	}
 
-	return conn.NewSession(nil),
-		func() {
-			inUseCount := atomic.AddInt64(&tb.inUseCount, -1)
-			if inUseCount < 1 {
-				mysqlC.Terminate(ctx)
-				conn.Close()
-			}
-		},
-		nil
+	return conn, terminateFunc, nil
 }

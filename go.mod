@@ -72,7 +72,7 @@ require (
 	github.com/golang-migrate/migrate/v4 v4.16.2
 	github.com/invopop/yaml v0.2.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
-	github.com/labstack/gommon v0.4.0 // indirect
+	github.com/labstack/gommon v0.4.0
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.19 // indirect
@@ -84,6 +84,7 @@ require (
 	github.com/smartystreets/goconvey v1.8.1
 	github.com/stretchr/objx v0.5.0 // indirect
 	github.com/testcontainers/testcontainers-go v0.26.0
+	github.com/testcontainers/testcontainers-go/modules/mysql v0.26.0
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	golang.org/x/crypto v0.16.0 // indirect
