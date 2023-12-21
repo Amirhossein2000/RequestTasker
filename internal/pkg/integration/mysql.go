@@ -24,6 +24,9 @@ type testDB struct {
 
 var tb *testDB
 
+const databaseName = "test_db"
+
+// TODO: return conn
 func SetupMySQLContainer() (*dbr.Session, func(), error) {
 	if tb != nil {
 		atomic.AddInt64(&tb.inUseCount, 1)
@@ -35,8 +38,6 @@ func SetupMySQLContainer() (*dbr.Session, func(), error) {
 	}
 
 	ctx := context.Background()
-
-	databaseName := "test_db"
 
 	req := testcontainers.ContainerRequest{
 		Image:        "mysql:latest",

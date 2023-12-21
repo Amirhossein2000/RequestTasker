@@ -89,6 +89,32 @@ func TestPostTask(t *testing.T) {
 		go testServer.Start()
 		defer testServer.Shutdown(context.Background())
 
+		Convey("return 201 when everything is fine", func() {
+			body := api.PostTaskJSONRequestBody{
+				Body: lo.ToPtr(`{"test":"test"}`),
+				Headers: &map[string]interface{}{
+					"test": "test",
+				},
+				Method: "GET",
+				Url:    "https://www.google.com",
+			}
+
+			byteBody, err := json.Marshal(body)
+			So(err, ShouldBeNil)
+
+			rBody := bytes.NewBuffer(byteBody)
+			req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("http://%s/task", testServerAddr), rBody)
+			So(err, ShouldBeNil)
+
+			req.Header.Set("Content-Type", "application/json")
+			req.Header.Set("Authorization", apiKey)
+
+			resp, err := http.DefaultClient.Do(req)
+			So(err, ShouldBeNil)
+
+			So(resp.StatusCode, ShouldEqual, http.StatusCreated)
+		})
+
 		Convey("return 400 when url is invalid", func() {
 			body := api.PostTaskJSONRequestBody{
 				Body: lo.ToPtr(`{"test":"test"}`),
@@ -162,6 +188,5 @@ func TestPostTask(t *testing.T) {
 
 			So(resp.StatusCode, ShouldEqual, http.StatusUnauthorized)
 		})
-
 	})
 }
