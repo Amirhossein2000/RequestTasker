@@ -55,6 +55,10 @@ func convertHeadersForResponse(headers map[string]string) map[string]interface{}
 }
 
 func validateGetTaskIdRequestObject(request api.GetTaskIdRequestObject) (uuid.UUID, error) {
+	if request.Id == "" {
+		return uuid.Nil, errors.New("id is required")
+	}
+
 	publicId, err := uuid.Parse(request.Id)
 	if err != nil {
 		return uuid.Nil, errors.New("invalid id format")

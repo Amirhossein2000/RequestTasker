@@ -1,8 +1,12 @@
 package handlers
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
+	"fmt"
 	"net/http"
+	"net/url"
 	"time"
 
 	"github.com/Amirhossein2000/RequestTasker/internal/app/api"
@@ -20,6 +24,37 @@ import (
 type testEnv struct {
 	addr   string
 	apiKey string
+}
+
+func (e *testEnv) newReq(method string, route string, body any) (*http.Request, error) {
+	rBody := bytes.NewBuffer(nil)
+
+	if body != nil {
+		byteBody, err := json.Marshal(body)
+		if err != nil {
+			return nil, err
+		}
+
+		rBody = bytes.NewBuffer(byteBody)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	u, err := url.JoinPath(fmt.Sprintf("http://%s", e.addr), route)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodGet, u, rBody)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", e.apiKey)
+
+	return req, nil
 }
 
 func setUpTestEnv() (*testEnv, func(), error) {

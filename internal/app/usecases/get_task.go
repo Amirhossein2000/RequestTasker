@@ -32,7 +32,7 @@ func NewGetTaskUseCase(
 }
 
 func (u GetTaskUseCase) Execute(ctx context.Context, publicID uuid.UUID) (*entities.Task, *entities.TaskStatus, *entities.TaskResult, error) {
-	task, err := u.taskRepository.GetByPublicID(ctx, publicID)
+	task, err := u.taskRepository.GetByPublicID(ctx, publicID) //TODO: return found
 	if err != nil {
 		// TODO log
 		return nil, nil, nil, common.ErrInternal

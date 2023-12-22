@@ -118,6 +118,7 @@ func TestPostTask(t *testing.T) {
 			So(err, ShouldBeNil)
 
 			So(resp.StatusCode, ShouldEqual, http.StatusCreated)
+			// TODO: check the response body and the created public-id
 		})
 	})
 }
