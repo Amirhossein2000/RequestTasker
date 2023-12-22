@@ -15,27 +15,31 @@ import (
 )
 
 func TestTaskResultRepository(t *testing.T) {
+	conn, tearDown, err := integration.SetupMySQLContainer()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer tearDown()
+
+	repo := NewTaskResultRepository(conn.NewSession(nil), common.TaskResultTable)
+
+	task := test.NewTestTask()
+	taskRepo := NewTaskRepository(conn.NewSession(nil), common.TaskTable)
+	createdTask, err := taskRepo.Create(context.Background(), task)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	TaskResult := entities.NewTaskResult(
+		createdTask.ID(),
+		200,
+		map[string]string{
+			"Test": "Test",
+		},
+		10,
+	)
+
 	Convey("TaskResultRepository INSERT and SELECT queries", t, func() {
-		conn, tearDown, err := integration.SetupMySQLContainer()
-		So(err, ShouldBeNil)
-		defer tearDown()
-
-		repo := NewTaskResultRepository(conn.NewSession(nil), common.TaskResultTable)
-
-		task := test.NewTestTask()
-		taskRepo := NewTaskRepository(conn.NewSession(nil), common.TaskTable)
-		createdTask, err := taskRepo.Create(context.Background(), task)
-		So(err, ShouldBeNil)
-
-		TaskResult := entities.NewTaskResult(
-			createdTask.ID(),
-			200,
-			map[string]string{
-				"Test": "Test",
-			},
-			10,
-		)
-
 		Convey("Insert new task and check created task", func() {
 			createdTaskResult, err := repo.Create(context.Background(), TaskResult)
 			So(err, ShouldBeNil)

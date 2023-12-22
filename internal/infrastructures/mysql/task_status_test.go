@@ -15,23 +15,27 @@ import (
 )
 
 func TestTaskStatusRepository(t *testing.T) {
+	conn, tearDown, err := integration.SetupMySQLContainer()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer tearDown()
+
+	repo := NewTaskStatusRepository(conn.NewSession(nil), common.TaskStatusTable)
+
+	task := test.NewTestTask()
+	taskRepo := NewTaskRepository(conn.NewSession(nil), common.TaskTable)
+	createdTask, err := taskRepo.Create(context.Background(), task)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	taskStatus := entities.NewTaskStatus(
+		createdTask.ID(),
+		common.StatusNEW,
+	)
+
 	Convey("TaskStatusRepository INSERT and SELECT queries", t, func() {
-		conn, tearDown, err := integration.SetupMySQLContainer()
-		So(err, ShouldBeNil)
-		defer tearDown()
-
-		repo := NewTaskStatusRepository(conn.NewSession(nil), common.TaskStatusTable)
-
-		task := test.NewTestTask()
-		taskRepo := NewTaskRepository(conn.NewSession(nil), common.TaskTable)
-		createdTask, err := taskRepo.Create(context.Background(), task)
-		So(err, ShouldBeNil)
-
-		taskStatus := entities.NewTaskStatus(
-			createdTask.ID(),
-			common.StatusNEW,
-		)
-
 		Convey("Insert new task and check created task", func() {
 			createdTaskStatus, err := repo.Create(context.Background(), taskStatus)
 			So(err, ShouldBeNil)
