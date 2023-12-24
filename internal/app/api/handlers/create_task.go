@@ -48,7 +48,7 @@ func (h *Handler) PostTask(ctx context.Context, request api.PostTaskRequestObjec
 	}, nil
 }
 
-func convertHeadersForRequest(headers map[string]interface{}) map[string]string {
+func convertHeadersForRequest(headers map[string]any) map[string]string {
 	result := make(map[string]string)
 
 	for key, value := range headers {

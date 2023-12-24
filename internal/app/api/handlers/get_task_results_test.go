@@ -103,10 +103,10 @@ func TestGetTaskId(t *testing.T) {
 			_, err = env.taskResultRepository.Create(ctx, result)
 			So(err, ShouldBeNil)
 
-			body := api.GetTaskIdRequestObject{
+			reqBody := api.GetTaskIdRequestObject{
 				Id: task.PublicID().String(),
 			}
-			req, err := env.newReq(http.MethodGet, fmt.Sprintf(route, body.Id), body)
+			req, err := env.newReq(http.MethodGet, fmt.Sprintf(route, reqBody.Id), reqBody)
 			So(err, ShouldBeNil)
 
 			resp, err := http.DefaultClient.Do(req)

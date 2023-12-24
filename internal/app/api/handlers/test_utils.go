@@ -51,7 +51,7 @@ func (e *testEnv) newReq(method string, route string, body any) (*http.Request, 
 		return nil, err
 	}
 
-	req, err := http.NewRequest(http.MethodGet, u, rBody)
+	req, err := http.NewRequest(method, u, rBody)
 	if err != nil {
 		return nil, err
 	}

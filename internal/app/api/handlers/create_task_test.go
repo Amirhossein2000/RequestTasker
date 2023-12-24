@@ -2,12 +2,15 @@ package handlers
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"testing"
 
 	"github.com/Amirhossein2000/RequestTasker/internal/app/api"
+	"github.com/google/uuid"
 	"github.com/samber/lo"
 	. "github.com/smartystreets/goconvey/convey"
 )
@@ -18,10 +21,11 @@ func TestPostTask(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer terminate()
+	ctx := context.Background()
 
 	Convey("PostTask all possible responses", t, func() {
 		Convey("return 400 when url is invalid", func() {
-			body := api.PostTaskJSONRequestBody{
+			reqBody := api.PostTaskJSONRequestBody{
 				Body: lo.ToPtr(`{"test":"test"}`),
 				Headers: &map[string]interface{}{
 					"test": "test",
@@ -30,13 +34,7 @@ func TestPostTask(t *testing.T) {
 				Url:    "InvalidURL",
 			}
 
-			byteBody, err := json.Marshal(body)
-			So(err, ShouldBeNil)
-
-			rBody := bytes.NewBuffer(byteBody)
-			req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("http://%s/task", env.addr), rBody)
-			req.Header.Set("Content-Type", "application/json")
-			req.Header.Set("Authorization", env.apiKey)
+			req, err := env.newReq(http.MethodPost, "/task", reqBody)
 			So(err, ShouldBeNil)
 
 			resp, err := http.DefaultClient.Do(req)
@@ -46,7 +44,7 @@ func TestPostTask(t *testing.T) {
 		})
 
 		Convey("return 400 when method is invalid", func() {
-			body := api.PostTaskJSONRequestBody{
+			reqBody := api.PostTaskJSONRequestBody{
 				Body: lo.ToPtr(`{"test":"test"}`),
 				Headers: &map[string]interface{}{
 					"test": "test",
@@ -55,13 +53,7 @@ func TestPostTask(t *testing.T) {
 				Url:    "www.google.com",
 			}
 
-			byteBody, err := json.Marshal(body)
-			So(err, ShouldBeNil)
-
-			rBody := bytes.NewBuffer(byteBody)
-			req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("http://%s/task", env.addr), rBody)
-			req.Header.Set("Content-Type", "application/json")
-			req.Header.Set("Authorization", env.apiKey)
+			req, err := env.newReq(http.MethodPost, "/task", reqBody)
 			So(err, ShouldBeNil)
 
 			resp, err := http.DefaultClient.Do(req)
@@ -71,7 +63,7 @@ func TestPostTask(t *testing.T) {
 		})
 
 		Convey("return 401 when api-key is missing", func() {
-			body := api.PostTaskJSONRequestBody{
+			reqBody := api.PostTaskJSONRequestBody{
 				Body: lo.ToPtr(`{"test":"test"}`),
 				Headers: &map[string]interface{}{
 					"test": "test",
@@ -80,7 +72,7 @@ func TestPostTask(t *testing.T) {
 				Url:    "www.google.com",
 			}
 
-			byteBody, err := json.Marshal(body)
+			byteBody, err := json.Marshal(reqBody)
 			So(err, ShouldBeNil)
 
 			rBody := bytes.NewBuffer(byteBody)
@@ -95,7 +87,7 @@ func TestPostTask(t *testing.T) {
 		})
 
 		Convey("return 201 when everything is fine", func() {
-			body := api.PostTaskJSONRequestBody{
+			reqBody := api.PostTaskJSONRequestBody{
 				Body: lo.ToPtr(`{"test":"test"}`),
 				Headers: &map[string]interface{}{
 					"test": "test",
@@ -104,21 +96,32 @@ func TestPostTask(t *testing.T) {
 				Url:    "https://www.google.com",
 			}
 
-			byteBody, err := json.Marshal(body)
+			req, err := env.newReq(http.MethodPost, "/task", reqBody)
 			So(err, ShouldBeNil)
-
-			rBody := bytes.NewBuffer(byteBody)
-			req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("http://%s/task", env.addr), rBody)
-			So(err, ShouldBeNil)
-
-			req.Header.Set("Content-Type", "application/json")
-			req.Header.Set("Authorization", env.apiKey)
 
 			resp, err := http.DefaultClient.Do(req)
 			So(err, ShouldBeNil)
-
 			So(resp.StatusCode, ShouldEqual, http.StatusCreated)
-			// TODO: check the response body and the created public-id
+
+			respByteBody, err := io.ReadAll(resp.Body)
+			So(err, ShouldBeNil)
+
+			respBody := api.PostTask201JSONResponse{}
+			err = json.Unmarshal(respByteBody, &respBody)
+			So(err, ShouldBeNil)
+
+			So(respBody.Id, ShouldNotBeEmpty)
+
+			publicID, err := uuid.Parse(respBody.Id)
+			So(err, ShouldBeNil)
+
+			createdTask, err := env.taskRepository.GetByPublicID(ctx, publicID)
+			So(err, ShouldBeNil)
+
+			So(createdTask.Body(), ShouldEqual, *reqBody.Body)
+			So(createdTask.Headers(), ShouldEqual, convertHeadersForRequest(*reqBody.Headers))
+			So(createdTask.Method(), ShouldEqual, string(reqBody.Method))
+			So(createdTask.Url(), ShouldEqual, reqBody.Url)
 		})
 	})
 }
