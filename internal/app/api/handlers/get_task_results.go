@@ -45,8 +45,8 @@ func (h *Handler) GetTaskId(ctx context.Context, request api.GetTaskIdRequestObj
 	return resp, nil
 }
 
-func convertHeadersForResponse(headers map[string]string) map[string]interface{} {
-	result := make(map[string]interface{})
+func convertHeadersForResponse(headers map[string]string) map[string]any {
+	result := make(map[string]any)
 
 	for key, value := range headers {
 		result[key] = value

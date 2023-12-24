@@ -15,6 +15,7 @@ import (
 	"github.com/Amirhossein2000/RequestTasker/internal/app/services/tasker"
 	"github.com/Amirhossein2000/RequestTasker/internal/app/usecases"
 	"github.com/Amirhossein2000/RequestTasker/internal/domain/common"
+	"github.com/Amirhossein2000/RequestTasker/internal/domain/entities"
 	"github.com/Amirhossein2000/RequestTasker/internal/infrastructures/kafka"
 	"github.com/Amirhossein2000/RequestTasker/internal/infrastructures/mysql"
 	"github.com/Amirhossein2000/RequestTasker/internal/pkg/integration"
@@ -24,6 +25,10 @@ import (
 type testEnv struct {
 	addr   string
 	apiKey string
+
+	taskRepository       entities.TaskRepository
+	taskStatusRepository entities.TaskStatusRepository
+	taskResultRepository entities.TaskResultRepository
 }
 
 func (e *testEnv) newReq(method string, route string, body any) (*http.Request, error) {
@@ -124,8 +129,11 @@ func setUpTestEnv() (*testEnv, func(), error) {
 	go testServer.Start()
 
 	return &testEnv{
-			addr:   testServerAddr,
-			apiKey: apiKey,
+			addr:                 testServerAddr,
+			apiKey:               apiKey,
+			taskRepository:       taskRepository,
+			taskStatusRepository: taskStatusRepository,
+			taskResultRepository: taskResultRepository,
 		}, func() {
 			testServer.Shutdown(context.Background())
 			tearDown()
