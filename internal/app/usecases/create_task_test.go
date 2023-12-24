@@ -51,7 +51,7 @@ func TestCreateTaskUseCase_Execute(t *testing.T) {
 				Return(nil, expectedErr)
 
 			_, err := createTaskUseCase.Execute(ctx, newTask)
-			So(err, ShouldEqual, common.ErrInternal)
+			So(err, ShouldEqual, expectedErr)
 		})
 
 		Convey("When taskRepository.Create() works", func() {
@@ -65,7 +65,7 @@ func TestCreateTaskUseCase_Execute(t *testing.T) {
 					Return(nil, expectedErr)
 
 				_, err := createTaskUseCase.Execute(ctx, newTask)
-				So(err, ShouldEqual, common.ErrInternal)
+				So(err, ShouldEqual, expectedErr)
 			})
 
 			Convey("When taskStatusRepository.Create() works", func() {
@@ -79,7 +79,7 @@ func TestCreateTaskUseCase_Execute(t *testing.T) {
 						Return(expectedErr)
 
 					_, err := createTaskUseCase.Execute(ctx, newTask)
-					So(err, ShouldEqual, common.ErrInternal)
+					So(err, ShouldEqual, expectedErr)
 				})
 
 				Convey("When tasker.RegisterTask() works", func() {

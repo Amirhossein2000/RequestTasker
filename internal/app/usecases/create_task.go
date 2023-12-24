@@ -39,21 +39,18 @@ func NewCreateTaskUseCase(
 func (u CreateTaskUseCase) Execute(ctx context.Context, task entities.Task) (uuid.UUID, error) {
 	createdTask, err := u.taskRepository.Create(ctx, task)
 	if err != nil {
-		// TODO log
-		return uuid.Nil, common.ErrInternal
+		return uuid.Nil, err
 	}
 
 	status := entities.NewTaskStatus(createdTask.ID(), common.StatusNEW)
 	_, err = u.taskStatusRepository.Create(ctx, status)
 	if err != nil {
-		// TODO log
-		return uuid.Nil, common.ErrInternal
+		return uuid.Nil, err
 	}
 
 	err = u.tasker.RegisterTask(ctx, *createdTask)
 	if err != nil {
-		// TODO log
-		return uuid.Nil, common.ErrInternal
+		return uuid.Nil, err
 	}
 
 	return createdTask.PublicID(), nil

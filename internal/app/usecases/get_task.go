@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/Amirhossein2000/RequestTasker/internal/app/services/logger"
-	"github.com/Amirhossein2000/RequestTasker/internal/domain/common"
 	"github.com/Amirhossein2000/RequestTasker/internal/domain/entities"
 
 	"github.com/google/uuid"
@@ -32,16 +31,15 @@ func NewGetTaskUseCase(
 }
 
 func (u GetTaskUseCase) Execute(ctx context.Context, publicID uuid.UUID) (*entities.Task, *entities.TaskStatus, *entities.TaskResult, error) {
-	task, err := u.taskRepository.GetByPublicID(ctx, publicID) //TODO: return found
+	task, err := u.taskRepository.GetByPublicID(ctx, publicID)
 	if err != nil {
-		// TODO log
-		return nil, nil, nil, common.ErrInternal
+		return nil, nil, nil, err
 	}
 
 	taskStatus, err := u.taskStatusRepository.GetLatestByTaskID(ctx, task.ID())
 	if err != nil {
 		// TODO log
-		return nil, nil, nil, common.ErrInternal
+		return nil, nil, nil, err
 	}
 
 	if !taskStatus.HasResult() {
@@ -51,7 +49,7 @@ func (u GetTaskUseCase) Execute(ctx context.Context, publicID uuid.UUID) (*entit
 	taskResult, err := u.taskResultRepository.GetByTaskID(ctx, task.ID())
 	if err != nil {
 		// TODO log
-		return nil, nil, nil, common.ErrInternal
+		return nil, nil, nil, err
 	}
 
 	return task, taskStatus, taskResult, nil

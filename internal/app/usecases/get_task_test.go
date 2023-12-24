@@ -51,7 +51,7 @@ func TestGetTaskUseCase_Execute(t *testing.T) {
 				Return(nil, expectedErr)
 
 			_, _, _, err := getTaskUseCase.Execute(ctx, expectedTask.PublicID())
-			So(err, ShouldEqual, common.ErrInternal)
+			So(err, ShouldEqual, expectedErr)
 		})
 
 		Convey("When taskRepository.GetByPublicID() works", func() {
@@ -65,7 +65,7 @@ func TestGetTaskUseCase_Execute(t *testing.T) {
 					Return(&expectedStatus, expectedErr)
 
 				_, _, _, err := getTaskUseCase.Execute(ctx, expectedTask.PublicID())
-				So(err, ShouldEqual, common.ErrInternal)
+				So(err, ShouldEqual, expectedErr)
 			})
 
 			Convey("When taskStatusRepository.GetLatestByTaskID() returns status without result", func() {
@@ -97,7 +97,7 @@ func TestGetTaskUseCase_Execute(t *testing.T) {
 						Return(nil, expectedErr)
 
 					_, _, _, err := getTaskUseCase.Execute(ctx, expectedTask.PublicID())
-					So(err, ShouldEqual, common.ErrInternal)
+					So(err, ShouldEqual, expectedErr)
 				})
 
 				Convey("When taskResultRepository.GetByTaskID() works", func() {
