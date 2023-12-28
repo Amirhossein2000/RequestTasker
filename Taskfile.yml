@@ -27,18 +27,15 @@ tasks:
     - task: test-usecase
     - task: test-kafka
     - task: test-api
-# setup dependencies
+  dep-up:
+    cmds:
+      - docker compose --env-file .env -f build/dep/docker-compose.yml up -d
+  dep-down:
+    cmds:
+      - docker-compose --env-file .env -f build/dep/docker-compose.yml down
 
-# clean dependencies
+# migration
 
 # run
 
 # stop
-
-# migration
-
-# clean db
-
-# test
-
-# test integration
