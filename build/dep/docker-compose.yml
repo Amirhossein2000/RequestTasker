@@ -44,10 +44,8 @@ services:
     ports:
       - "3306:3306"
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DB}
     healthcheck:
       test:
         [
@@ -61,3 +59,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
+    command: [ "--init-file", "/docker-entrypoint-initdb.d/init.sql" ]
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql

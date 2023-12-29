@@ -1,5 +1,7 @@
 version: "3"
 
+dotenv: ['.env']
+
 tasks:
   generate-api:
     cmds:
@@ -33,8 +35,9 @@ tasks:
   dep-down:
     cmds:
       - docker-compose --env-file .env -f build/dep/docker-compose.yml down
-
-# migration
+  migrate:
+    cmds:
+      - migrate -source file://migrations -database "mysql://$MYSQL_USER:$MYSQL_PASSWORD@tcp(localhost:3306)/$MYSQL_DB" up
 
 # run
 
