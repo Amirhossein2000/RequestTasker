@@ -1,4 +1,3 @@
-// server.go
 package server
 
 import (
@@ -10,9 +9,9 @@ import (
 )
 
 type Server struct {
-	Addr        string
-	Handlers    api.StrictServerInterface
-	Middlewares []api.StrictMiddlewareFunc
+	addr        string
+	handlers    api.StrictServerInterface
+	middlewares []api.StrictMiddlewareFunc
 	e           *echo.Echo
 }
 
@@ -22,18 +21,18 @@ func NewServer(
 	Middlewares []api.StrictMiddlewareFunc,
 ) *Server {
 	return &Server{
-		Addr:        addr,
-		Handlers:    handlers,
-		Middlewares: Middlewares,
+		addr:        addr,
+		handlers:    handlers,
+		middlewares: Middlewares,
 	}
 }
 
 func (s *Server) Start() error {
 	e := echo.New()
-	handlers := api.NewStrictHandler(s.Handlers, s.Middlewares)
+	handlers := api.NewStrictHandler(s.handlers, s.middlewares)
 	api.RegisterHandlers(e, handlers)
 	s.e = e
-	return s.e.Start(s.Addr)
+	return s.e.Start(s.addr)
 }
 
 func (s *Server) Shutdown(ctx context.Context) error {
