@@ -25,7 +25,6 @@ var tb *testDB
 
 const databaseName = "test_db"
 
-// TODO: return conn
 func SetupMySQLContainer() (*dbr.Connection, func(), error) {
 	if tb != nil {
 		return tb.conn, func() {}, nil
@@ -60,6 +59,7 @@ func SetupMySQLContainer() (*dbr.Connection, func(), error) {
 	}
 	connectionString := fmt.Sprintf("root:root@tcp(%s:%s)/%s?parseTime=true", host, port.Port(), databaseName)
 
+	// having wait in testcontainer produces lots of error logs so this sleep is better
 	time.Sleep(time.Second * 10)
 
 	conn, err := dbr.Open("mysql", connectionString, nil)

@@ -21,10 +21,10 @@ func TestTaskStatusRepository(t *testing.T) {
 	}
 	defer tearDown()
 
-	repo := NewTaskStatusRepository(conn.NewSession(nil), common.TaskStatusTable)
+	repo := NewTaskStatusRepository(conn, common.TaskStatusTable)
 
 	task := test.NewTestTask()
-	taskRepo := NewTaskRepository(conn.NewSession(nil), common.TaskTable)
+	taskRepo := NewTaskRepository(conn, common.TaskTable)
 	createdTask, err := taskRepo.Create(context.Background(), task)
 	if err != nil {
 		t.Fatal(err)

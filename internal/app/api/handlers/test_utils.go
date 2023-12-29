@@ -84,9 +84,9 @@ func setUpTestEnv() (*testEnv, func(), error) {
 		return nil, nil, err
 	}
 
-	taskRepository := mysql.NewTaskRepository(conn.NewSession(nil), common.TaskTable)
-	taskStatusRepository := mysql.NewTaskStatusRepository(conn.NewSession(nil), common.TaskStatusTable)
-	taskResultRepository := mysql.NewTaskResultRepository(conn.NewSession(nil), common.TaskResultTable)
+	taskRepository := mysql.NewTaskRepository(conn, common.TaskTable)
+	taskStatusRepository := mysql.NewTaskStatusRepository(conn, common.TaskStatusTable)
+	taskResultRepository := mysql.NewTaskResultRepository(conn, common.TaskResultTable)
 
 	tasker := tasker.NewTasker(
 		taskEventRepository,

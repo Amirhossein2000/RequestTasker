@@ -20,7 +20,7 @@ func TestTaskRepository(t *testing.T) {
 	}
 	defer tearDown()
 
-	repo := NewTaskRepository(conn.NewSession(nil), common.TaskTable)
+	repo := NewTaskRepository(conn, common.TaskTable)
 
 	task := test.NewTestTask()
 

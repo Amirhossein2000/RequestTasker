@@ -55,9 +55,9 @@ type TaskRepository struct {
 	tableName string
 }
 
-func NewTaskRepository(session *dbr.Session, tableName string) *TaskRepository {
+func NewTaskRepository(conn *dbr.Connection, tableName string) *TaskRepository {
 	return &TaskRepository{
-		session:   session,
+		session:   conn.NewSession(nil),
 		tableName: tableName,
 	}
 }
