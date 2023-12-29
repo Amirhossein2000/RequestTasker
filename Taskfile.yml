@@ -2,6 +2,8 @@ version: "3"
 
 dotenv: ['.env']
 
+# TODO: Descriptions
+
 tasks:
   generate-api:
     cmds:
@@ -31,14 +33,20 @@ tasks:
     - task: test-api
   dep-up:
     cmds:
-      - docker compose --env-file .env -f build/dep/docker-compose.yml up -d
+      - docker compose --env-file .env -f dep/docker-compose.yml up -d
   dep-down:
     cmds:
-      - docker-compose --env-file .env -f build/dep/docker-compose.yml down
+      - docker-compose --env-file .env -f dep/docker-compose.yml down
   migrate:
     cmds:
       - migrate -source file://migrations -database "mysql://$MYSQL_USER:$MYSQL_PASSWORD@tcp(localhost:3306)/$MYSQL_DB" up
-
-# run
-
-# stop
+  docker-up:
+    cmds:
+      - docker build -t tasker .
+      - docker run -p 8080:8080 --name tasker tasker
+  docker-down:
+    cmds:
+      - docker stop tasker && docker rm tasker && docker rmi tasker
+  server-up:
+    cmds:
+      - ./bin/cmd
