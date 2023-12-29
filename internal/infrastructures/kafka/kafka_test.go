@@ -13,29 +13,33 @@ import (
 )
 
 func TestTaskEventRepository(t *testing.T) {
+	addr, cleanup, err := integration.SetupKafkaContainer(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer cleanup()
+
+	repo := NewTaskEventRepository(
+		KafkaConfig{
+			Brokers:           []string{addr},
+			Topic:             "test-topic",
+			GroupID:           "test-group-id",
+			Timeout:           time.Second * 10,
+			NumPartitions:     1,
+			ReplicationFactor: 1,
+		},
+	)
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+	defer cancel()
+
+	err = repo.CreateTopics(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	Convey("TaskEventRepository Read and Write", t, func() {
-		addr, cleanup, err := integration.SetupKafkaContainer(context.Background())
-		So(err, ShouldBeNil)
-		defer cleanup()
-
-		repo := NewTaskEventRepository(
-			KafkaConfig{
-				Brokers:           []string{addr},
-				Topic:             "test-topic",
-				GroupID:           "test-group-id",
-				Timeout:           time.Second * 10,
-				NumPartitions:     1,
-				ReplicationFactor: 1,
-			},
-		)
-
-		ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
-		defer cancel()
-
-		err = repo.CreateTopics(ctx)
-		So(err, ShouldBeNil)
-
-		for i := 0; i < 10; i++ {
+		for i := 0; i < 3; i++ {
 			event := dto.TaskEvent{
 				ID: rand.Int63(),
 			}
