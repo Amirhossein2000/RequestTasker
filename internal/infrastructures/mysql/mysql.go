@@ -6,14 +6,14 @@ import (
 	"github.com/gocraft/dbr/v2"
 )
 
-type MYSQLConfig struct {
+type Config struct {
 	Addr     string
 	User     string
 	Password string
 	Database string
 }
 
-func NewMYSQLConn(conf MYSQLConfig) (*dbr.Connection, error) {
+func NewMYSQLConn(conf Config) (*dbr.Connection, error) {
 	connectionString := fmt.Sprintf("%s:%s@tcp(%s)/%s?parseTime=true", conf.User, conf.Password, conf.Addr, conf.Database)
 
 	conn, err := dbr.Open("mysql", connectionString, nil)

@@ -8,7 +8,7 @@ import (
 	"github.com/segmentio/kafka-go"
 )
 
-type KafkaConfig struct {
+type Config struct {
 	Brokers           []string
 	Topic             string
 	GroupID           string
@@ -18,12 +18,12 @@ type KafkaConfig struct {
 }
 
 type TaskEventRepository struct {
-	config KafkaConfig
+	config Config
 	writer *kafka.Writer
 	reader *kafka.Reader
 }
 
-func NewTaskEventRepository(conf KafkaConfig) *TaskEventRepository {
+func NewTaskEventRepository(conf Config) *TaskEventRepository {
 	dialer := &kafka.Dialer{
 		Timeout:   conf.Timeout,
 		DualStack: true,

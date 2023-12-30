@@ -49,4 +49,5 @@ tasks:
       - docker stop tasker && docker rm tasker && docker rmi tasker
   server-up:
     cmds:
+      - export $(cat .env | xargs)
       - ./bin/cmd

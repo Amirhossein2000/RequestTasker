@@ -20,7 +20,7 @@ func TestTaskEventRepository(t *testing.T) {
 	defer cleanup()
 
 	repo := NewTaskEventRepository(
-		KafkaConfig{
+		Config{
 			Brokers:           []string{addr},
 			Topic:             "test-topic",
 			GroupID:           "test-group-id",

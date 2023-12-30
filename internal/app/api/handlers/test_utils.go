@@ -69,7 +69,7 @@ func setUpTestEnv() (*testEnv, func(), error) {
 	}
 
 	taskEventRepository := kafka.NewTaskEventRepository(
-		kafka.KafkaConfig{
+		kafka.Config{
 			Brokers:           []string{addr},
 			Topic:             "test-topic",
 			GroupID:           "test-group-id",
