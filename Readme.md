@@ -18,3 +18,7 @@ brew install mockery
 ``` bash
 brew install golang-migrate
 ```
+
+``` bash
+brew install direnv
+```
