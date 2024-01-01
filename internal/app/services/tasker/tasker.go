@@ -65,20 +65,23 @@ func (t *Tasker) produce(ctx context.Context) error {
 			}
 			data, err := event.Serialize()
 			if err != nil {
+				// TODO: logs
 				return err
 			}
 			err = t.taskEventRepository.Write(ctx, data)
 			if err != nil {
+				// TODO: logs
 				return err
 			}
 
 			taskStatus := entities.NewTaskStatus(
 				task.ID(),
-				common.StatusIN_PROGRESS,
+				common.StatusInProcess,
 			)
 
 			_, err = t.taskStatusRepository.Create(ctx, taskStatus)
 			if err != nil {
+				// TODO: logs
 				return err
 			}
 		}
@@ -93,16 +96,19 @@ func (t *Tasker) consume(ctx context.Context) error {
 		default:
 			data, err := t.taskEventRepository.Read(ctx)
 			if err != nil {
+				// TODO: logs
 				return err
 			}
 
 			event, err := dto.NewTaskEvent(data)
 			if err != nil {
+				// TODO: logs
 				return err
 			}
 
 			err = t.sendTask(ctx, event.PublicID)
 			if err != nil {
+				// TODO: logs
 				return err
 			}
 		}
@@ -147,7 +153,7 @@ func (t *Tasker) sendTask(ctx context.Context, taskPublicID uuid.UUID) error {
 	if err != nil {
 		taskStatus := entities.NewTaskStatus(
 			task.ID(),
-			common.StatusERROR,
+			common.StatusError,
 		)
 
 		_, dbErr := t.taskStatusRepository.Create(ctx, taskStatus)
@@ -184,12 +190,12 @@ func (t *Tasker) sendTask(ctx context.Context, taskPublicID uuid.UUID) error {
 	if resp.StatusCode > 199 && resp.StatusCode < 300 {
 		taskStatus = entities.NewTaskStatus(
 			task.ID(),
-			common.StatusDONE,
+			common.StatusDone,
 		)
 	} else {
 		taskStatus = entities.NewTaskStatus(
 			task.ID(),
-			common.StatusERROR,
+			common.StatusError,
 		)
 	}
 

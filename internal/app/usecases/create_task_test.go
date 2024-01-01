@@ -43,7 +43,7 @@ func TestCreateTaskUseCase_Execute(t *testing.T) {
 			newTask.Headers(),
 			newTask.Body(),
 		)
-		expectedStatus := entities.NewTaskStatus(expectedTask.ID(), common.StatusNEW)
+		expectedStatus := entities.NewTaskStatus(expectedTask.ID(), common.StatusNew)
 
 		Convey("When taskRepository.Create() returns error", func() {
 			taskRepository.

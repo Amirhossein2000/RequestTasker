@@ -57,7 +57,7 @@ func TestGetTaskId(t *testing.T) {
 			createdTask, err := env.taskRepository.Create(ctx, task)
 			So(err, ShouldBeNil)
 
-			status := entities.NewTaskStatus(createdTask.ID(), common.StatusIN_PROGRESS)
+			status := entities.NewTaskStatus(createdTask.ID(), common.StatusInProcess)
 			_, err = env.taskStatusRepository.Create(ctx, status)
 			So(err, ShouldBeNil)
 
@@ -89,7 +89,7 @@ func TestGetTaskId(t *testing.T) {
 			createdTask, err := env.taskRepository.Create(ctx, task)
 			So(err, ShouldBeNil)
 
-			status := entities.NewTaskStatus(createdTask.ID(), common.StatusDONE)
+			status := entities.NewTaskStatus(createdTask.ID(), common.StatusDone)
 			_, err = env.taskStatusRepository.Create(ctx, status)
 			So(err, ShouldBeNil)
 

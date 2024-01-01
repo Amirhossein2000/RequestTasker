@@ -32,7 +32,7 @@ func TestTaskStatusRepository(t *testing.T) {
 
 	taskStatusNEW := entities.NewTaskStatus(
 		createdTask.ID(),
-		common.StatusNEW,
+		common.StatusNew,
 	)
 
 	Convey("TaskStatusRepository INSERT and SELECT queries", t, func() {
@@ -46,7 +46,7 @@ func TestTaskStatusRepository(t *testing.T) {
 
 			taskStatusDONE := entities.NewTaskStatus(
 				createdTask.ID(),
-				common.StatusDONE,
+				common.StatusDone,
 			)
 			createdTaskStatus, err = repo.Create(context.Background(), taskStatusDONE)
 			So(err, ShouldBeNil)

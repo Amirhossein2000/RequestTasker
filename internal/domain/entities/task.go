@@ -21,7 +21,7 @@ type Task struct {
 	url     string
 	method  string // TODO: make this enum
 	headers map[string]string
-	body    string
+	body    string // TODO: make it pointer
 }
 
 func NewTask(

@@ -42,7 +42,7 @@ func (u CreateTaskUseCase) Execute(ctx context.Context, task entities.Task) (uui
 		return uuid.Nil, err
 	}
 
-	status := entities.NewTaskStatus(createdTask.ID(), common.StatusNEW)
+	status := entities.NewTaskStatus(createdTask.ID(), common.StatusNew)
 	_, err = u.taskStatusRepository.Create(ctx, status)
 	if err != nil {
 		return uuid.Nil, err

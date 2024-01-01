@@ -43,7 +43,7 @@ func TestGetTaskUseCase_Execute(t *testing.T) {
 			newTask.Headers(),
 			newTask.Body(),
 		)
-		expectedStatus := entities.NewTaskStatus(expectedTask.ID(), common.StatusNEW)
+		expectedStatus := entities.NewTaskStatus(expectedTask.ID(), common.StatusNew)
 
 		Convey("When taskRepository.GetByPublicID() returns error", func() {
 			taskRepository.
@@ -80,7 +80,7 @@ func TestGetTaskUseCase_Execute(t *testing.T) {
 			})
 
 			Convey("When taskStatusRepository.GetLatestByTaskID() returns status with result", func() {
-				expectedStatus := entities.NewTaskStatus(expectedTask.ID(), common.StatusDONE)
+				expectedStatus := entities.NewTaskStatus(expectedTask.ID(), common.StatusDone)
 				expectedResult := entities.NewTaskResult(
 					expectedTask.ID(),
 					200,

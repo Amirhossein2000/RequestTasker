@@ -64,8 +64,8 @@ func (ts TaskStatus) TaskID() int64 {
 func (ts TaskStatus) HasResult() bool {
 	return slices.Contains(
 		[]string{
-			common.StatusDONE,
-			common.StatusERROR,
+			common.StatusDone,
+			common.StatusError,
 		},
 		ts.status)
 }

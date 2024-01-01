@@ -19,7 +19,7 @@ func (h *Handler) PostTask(ctx context.Context, request api.PostTaskRequestObjec
 		}, nil
 	}
 
-	headers := make(map[string]string)
+	var headers map[string]string
 	body := ""
 
 	if request.Body.Headers != nil {
@@ -40,7 +40,6 @@ func (h *Handler) PostTask(ctx context.Context, request api.PostTaskRequestObjec
 	publicId, err := h.createTaskUseCase.Execute(ctx, task)
 	if err != nil {
 		// TODO log
-		fmt.Println("--------->", err)
 		return api.PostTask500Response{}, nil
 	}
 
