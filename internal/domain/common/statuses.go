@@ -1,6 +1,6 @@
 package common
 
-const StatusNEW = "NEW"
-const StatusIN_PROGRESS = "IN_PROGRESS"
-const StatusDONE = "DONE"
-const StatusERROR = "ERROR"
+const StatusNEW = "new"
+const StatusIN_PROGRESS = "in_process"
+const StatusDONE = "done"
+const StatusERROR = "error"
