@@ -53,5 +53,4 @@ tasks:
       - docker stop tasker && docker rm tasker && docker rmi tasker
   server-up:
     cmds:
-      - export $(cat .env | xargs) #TODO: run every time
-      - ./bin/cmd
+      - export $(cat .env | xargs) && ./bin/cmd
