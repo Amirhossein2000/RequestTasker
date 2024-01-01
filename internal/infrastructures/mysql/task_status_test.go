@@ -30,19 +30,29 @@ func TestTaskStatusRepository(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	taskStatus := entities.NewTaskStatus(
+	taskStatusNEW := entities.NewTaskStatus(
 		createdTask.ID(),
 		common.StatusNEW,
 	)
 
 	Convey("TaskStatusRepository INSERT and SELECT queries", t, func() {
 		Convey("Insert new task and check created task", func() {
-			createdTaskStatus, err := repo.Create(context.Background(), taskStatus)
+			createdTaskStatus, err := repo.Create(context.Background(), taskStatusNEW)
 			So(err, ShouldBeNil)
 
 			So(createdTaskStatus.ID(), ShouldNotEqual, int64(0))
-			So(createdTaskStatus.TaskID(), ShouldEqual, taskStatus.TaskID())
-			So(createdTaskStatus.Status(), ShouldEqual, taskStatus.Status())
+			So(createdTaskStatus.TaskID(), ShouldEqual, taskStatusNEW.TaskID())
+			So(createdTaskStatus.Status(), ShouldEqual, taskStatusNEW.Status())
+
+			taskStatusDONE := entities.NewTaskStatus(
+				createdTask.ID(),
+				common.StatusDONE,
+			)
+			createdTaskStatus, err = repo.Create(context.Background(), taskStatusDONE)
+			So(err, ShouldBeNil)
+			So(createdTaskStatus.ID(), ShouldNotEqual, int64(0))
+			So(createdTaskStatus.TaskID(), ShouldEqual, taskStatusDONE.TaskID())
+			So(createdTaskStatus.Status(), ShouldEqual, taskStatusDONE.Status())
 
 			Convey("TaskStatusRepository.GetLatestByTaskID()", func() {
 				foundTaskStatus, err := repo.GetLatestByTaskID(context.Background(), createdTaskStatus.TaskID())

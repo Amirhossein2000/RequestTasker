@@ -79,6 +79,7 @@ func (r *TaskStatusRepository) GetLatestByTaskID(ctx context.Context, taskID int
 		From(r.tableName).
 		Where(dbr.Eq("task_id", taskID)).
 		Limit(1).
+		OrderBy("id DESC").
 		LoadOneContext(ctx, taskStatusRow)
 
 	switch {
