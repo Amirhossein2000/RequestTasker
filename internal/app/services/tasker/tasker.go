@@ -47,21 +47,11 @@ func NewTasker(
 }
 
 func (t *Tasker) Start(ctx context.Context) {
-	go func() {
-		err := t.consume(ctx)
-		if err != nil {
-			panic(err)
-		}
-	}()
-	go func() {
-		err := t.produce(ctx)
-		if err != nil {
-			panic(err)
-		}
-	}()
+	go t.produce(ctx)
+	go t.consume(ctx)
 }
 
-func (t *Tasker) consume(ctx context.Context) error {
+func (t *Tasker) produce(ctx context.Context) error {
 	for {
 		select {
 		case <-ctx.Done():
@@ -94,7 +84,7 @@ func (t *Tasker) consume(ctx context.Context) error {
 	}
 }
 
-func (t *Tasker) produce(ctx context.Context) error {
+func (t *Tasker) consume(ctx context.Context) error {
 	for {
 		select {
 		case <-ctx.Done():
@@ -134,7 +124,13 @@ func (t *Tasker) sendTask(ctx context.Context, taskPublicID uuid.UUID) error {
 		return err
 	}
 
-	body := bytes.NewBuffer([]byte(task.Body()))
+	body := &bytes.Buffer{}
+	if task.Body() != "" {
+		body = bytes.NewBuffer([]byte(task.Body()))
+	} else {
+		body = nil
+	}
+
 	req, err := http.NewRequestWithContext(ctx, task.Method(), task.Url(), body)
 	if err != nil {
 		return err
