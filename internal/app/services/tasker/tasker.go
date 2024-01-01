@@ -3,6 +3,7 @@ package tasker
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -124,16 +125,18 @@ func (t *Tasker) sendTask(ctx context.Context, taskPublicID uuid.UUID) error {
 		return err
 	}
 
-	body := &bytes.Buffer{}
+	var req *http.Request
 	if task.Body() != "" {
-		body = bytes.NewBuffer([]byte(task.Body()))
+		body := bytes.NewBuffer([]byte(task.Body()))
+		req, err = http.NewRequestWithContext(ctx, task.Method(), task.Url(), body)
+		if err != nil {
+			return err
+		}
 	} else {
-		body = nil
-	}
-
-	req, err := http.NewRequestWithContext(ctx, task.Method(), task.Url(), body)
-	if err != nil {
-		return err
+		req, err = http.NewRequestWithContext(ctx, task.Method(), task.Url(), nil)
+		if err != nil {
+			return err
+		}
 	}
 
 	for key, value := range task.Headers() {
@@ -142,6 +145,15 @@ func (t *Tasker) sendTask(ctx context.Context, taskPublicID uuid.UUID) error {
 
 	resp, err := t.httpClient.Do(req)
 	if err != nil {
+		taskStatus := entities.NewTaskStatus(
+			task.ID(),
+			common.StatusERROR,
+		)
+
+		_, dbErr := t.taskStatusRepository.Create(ctx, taskStatus)
+		if err != nil {
+			return fmt.Errorf("send request error: %w, db error: %w", err, dbErr)
+		}
 		return err
 	}
 
@@ -168,10 +180,18 @@ func (t *Tasker) sendTask(ctx context.Context, taskPublicID uuid.UUID) error {
 		return err
 	}
 
-	taskStatus := entities.NewTaskStatus(
-		task.ID(),
-		common.StatusDONE,
-	)
+	var taskStatus entities.TaskStatus
+	if resp.StatusCode > 199 && resp.StatusCode < 300 {
+		taskStatus = entities.NewTaskStatus(
+			task.ID(),
+			common.StatusDONE,
+		)
+	} else {
+		taskStatus = entities.NewTaskStatus(
+			task.ID(),
+			common.StatusERROR,
+		)
+	}
 
 	_, err = t.taskStatusRepository.Create(ctx, taskStatus)
 	if err != nil {
