@@ -9,6 +9,7 @@ import (
 	"github.com/Amirhossein2000/RequestTasker/internal/domain/common"
 	"github.com/Amirhossein2000/RequestTasker/internal/domain/dto"
 	"github.com/Amirhossein2000/RequestTasker/internal/domain/entities"
+	"github.com/google/uuid"
 )
 
 //go:generate mockery --name TaskEventRepository --structname TaskEventRepositoryMock --output ../../../mocks/
@@ -23,8 +24,7 @@ type Tasker struct {
 	taskStatusRepository entities.TaskStatusRepository
 	taskResultRepository entities.TaskResultRepository
 	httpClient           *http.Client
-	in                   chan int64
-	out                  chan int64
+	in                   chan *entities.Task
 
 	// TODO logger
 }
@@ -42,20 +42,35 @@ func NewTasker(
 		taskStatusRepository: taskStatusRepository,
 		taskResultRepository: taskResultRepository,
 		httpClient:           httpClient,
-		in:                   make(chan int64, 128),
-		out:                  make(chan int64, 128),
+		in:                   make(chan *entities.Task, 128),
 	}
 }
 
-func (t *Tasker) Start(ctx context.Context) error {
+func (t *Tasker) Start(ctx context.Context) {
+	go func() {
+		err := t.consume(ctx)
+		if err != nil {
+			panic(err)
+		}
+	}()
+	go func() {
+		err := t.produce(ctx)
+		if err != nil {
+			panic(err)
+		}
+	}()
+}
+
+func (t *Tasker) consume(ctx context.Context) error {
 	for {
 		select {
 		case <-ctx.Done():
 			return nil
 
-		case taskID := <-t.in:
+		default:
+			task := <-t.in
 			event := dto.TaskEvent{
-				ID: taskID,
+				PublicID: task.PublicID(),
 			}
 			data, err := event.Serialize()
 			if err != nil {
@@ -67,7 +82,7 @@ func (t *Tasker) Start(ctx context.Context) error {
 			}
 
 			taskStatus := entities.NewTaskStatus(
-				taskID,
+				task.ID(),
 				common.StatusIN_PROGRESS,
 			)
 
@@ -75,7 +90,15 @@ func (t *Tasker) Start(ctx context.Context) error {
 			if err != nil {
 				return err
 			}
+		}
+	}
+}
 
+func (t *Tasker) produce(ctx context.Context) error {
+	for {
+		select {
+		case <-ctx.Done():
+			return nil
 		default:
 			data, err := t.taskEventRepository.Read(ctx)
 			if err != nil {
@@ -87,7 +110,7 @@ func (t *Tasker) Start(ctx context.Context) error {
 				return err
 			}
 
-			err = t.sendTask(ctx, event.ID)
+			err = t.sendTask(ctx, event.PublicID)
 			if err != nil {
 				return err
 			}
@@ -97,7 +120,7 @@ func (t *Tasker) Start(ctx context.Context) error {
 
 func (t *Tasker) RegisterTask(ctx context.Context, task entities.Task) error {
 	select {
-	case t.in <- task.ID():
+	case t.in <- &task:
 		return nil
 
 	default:
@@ -105,14 +128,13 @@ func (t *Tasker) RegisterTask(ctx context.Context, task entities.Task) error {
 	}
 }
 
-func (t *Tasker) sendTask(ctx context.Context, taskID int64) error {
-	task, err := t.taskRepository.Get(ctx, taskID)
+func (t *Tasker) sendTask(ctx context.Context, taskPublicID uuid.UUID) error {
+	task, err := t.taskRepository.GetByPublicID(ctx, taskPublicID)
 	if err != nil {
 		return err
 	}
 
 	body := bytes.NewBuffer([]byte(task.Body()))
-
 	req, err := http.NewRequestWithContext(ctx, task.Method(), task.Url(), body)
 	if err != nil {
 		return err

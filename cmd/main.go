@@ -41,8 +41,8 @@ func main() {
 	taskEventRepo := kafka.NewTaskEventRepository(*kafkaConf)
 
 	taskRepo := mysql.NewTaskRepository(conn, "tasks")
-	taskStatusRepo := mysql.NewTaskStatusRepository(conn, "taskStatuses")
-	taskResultRepo := mysql.NewTaskResultRepository(conn, "taskResults")
+	taskStatusRepo := mysql.NewTaskStatusRepository(conn, "task_statuses")
+	taskResultRepo := mysql.NewTaskResultRepository(conn, "task_results")
 
 	taskerService := tasker.NewTasker(
 		taskEventRepo,
@@ -51,12 +51,7 @@ func main() {
 		taskResultRepo,
 		http.DefaultClient,
 	)
-	go func() {
-		err := taskerService.Start(ctx)
-		if err != nil {
-			panic(err)
-		}
-	}()
+	taskerService.Start(ctx)
 
 	createTaskUsecase := usecases.NewCreateTaskUseCase(logger.Logger{}, taskRepo, taskStatusRepo, taskerService)
 	getTaskUsecase := usecases.NewGetTaskUseCase(logger.Logger{}, taskRepo, taskStatusRepo, taskResultRepo)

@@ -2,10 +2,12 @@ package dto
 
 import (
 	"encoding/json"
+
+	"github.com/google/uuid"
 )
 
 type TaskEvent struct {
-	ID int64 `json:"id"`
+	PublicID uuid.UUID `json:"public_id"`
 }
 
 func NewTaskEvent(data []byte) (*TaskEvent, error) {

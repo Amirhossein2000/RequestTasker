@@ -11,7 +11,6 @@ import (
 type TaskRepository interface {
 	Create(ctx context.Context, task Task) (*Task, error)
 	GetByPublicID(ctx context.Context, publicId uuid.UUID) (*Task, error)
-	Get(ctx context.Context, taskID int64) (*Task, error)
 }
 
 type Task struct {

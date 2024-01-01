@@ -6,7 +6,7 @@ components:
   schemas:
     TaskStatus:
       type: string
-      enum: [done, in_process, error, new]
+      enum: [done, in_process, error, new] #TODO uppercase
 
     HttpMethod:
       type: string

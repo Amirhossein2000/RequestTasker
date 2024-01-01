@@ -125,7 +125,3 @@ func (r *TaskRepository) GetByPublicID(ctx context.Context, publicID uuid.UUID) 
 
 	return taskRow.ConvertToEntity()
 }
-
-func (r *TaskRepository) Get(ctx context.Context, taskID int64) (*entities.Task, error) {
-	return nil, nil
-}

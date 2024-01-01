@@ -21,5 +21,5 @@ func NewMYSQLConn(conf Config) (*dbr.Connection, error) {
 		return nil, err
 	}
 
-	return conn, nil
+	return conn, conn.Ping()
 }

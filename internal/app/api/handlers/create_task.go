@@ -40,6 +40,7 @@ func (h *Handler) PostTask(ctx context.Context, request api.PostTaskRequestObjec
 	publicId, err := h.createTaskUseCase.Execute(ctx, task)
 	if err != nil {
 		// TODO log
+		fmt.Println("--------->", err)
 		return api.PostTask500Response{}, nil
 	}
 

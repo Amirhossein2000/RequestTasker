@@ -2,12 +2,12 @@ package kafka
 
 import (
 	"context"
-	"math/rand"
 	"testing"
 	"time"
 
 	"github.com/Amirhossein2000/RequestTasker/internal/domain/dto"
 	"github.com/Amirhossein2000/RequestTasker/internal/pkg/integration"
+	"github.com/google/uuid"
 
 	. "github.com/smartystreets/goconvey/convey"
 )
@@ -41,7 +41,7 @@ func TestTaskEventRepository(t *testing.T) {
 	Convey("TaskEventRepository Read and Write", t, func() {
 		for i := 0; i < 3; i++ {
 			event := dto.TaskEvent{
-				ID: rand.Int63(),
+				PublicID: uuid.New(),
 			}
 			writeValue, err := event.Serialize()
 			So(err, ShouldBeNil)
