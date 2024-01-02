@@ -1,4 +1,3 @@
-// setup_test.go
 package mysql
 
 import (

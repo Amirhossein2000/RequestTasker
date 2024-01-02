@@ -66,6 +66,7 @@ func SetupMySQLContainer() (*dbr.Connection, func(), error) {
 	if err != nil {
 		return nil, nil, err
 	}
+	conn.SetConnMaxIdleTime(30 * time.Second)
 
 	driver, err := migsql.WithInstance(conn.DB, &migsql.Config{
 		MigrationsTable: migsql.DefaultMigrationsTable,

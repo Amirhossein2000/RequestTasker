@@ -19,6 +19,7 @@ import (
 	"github.com/Amirhossein2000/RequestTasker/internal/infrastructures/kafka"
 	"github.com/Amirhossein2000/RequestTasker/internal/infrastructures/mysql"
 	"github.com/Amirhossein2000/RequestTasker/internal/pkg/integration"
+	"github.com/Amirhossein2000/RequestTasker/internal/pkg/test"
 	"github.com/labstack/gommon/random"
 )
 
@@ -62,7 +63,13 @@ func (e *testEnv) newReq(method string, route string, body any) (*http.Request, 
 	return req, nil
 }
 
+var tE *testEnv
+
 func setUpTestEnv() (*testEnv, func(), error) {
+	if tE != nil {
+		return tE, func() {}, nil
+	}
+
 	addr, cleanup, err := integration.SetupKafkaContainer(context.Background())
 	if err != nil {
 		return nil, nil, err
@@ -118,7 +125,12 @@ func setUpTestEnv() (*testEnv, func(), error) {
 		getTaskUseCase,
 	)
 
-	testServerAddr := "localhost:7777"
+	port, err := test.GetAvailablePort()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	testServerAddr := fmt.Sprintf("127.0.0.1:%d", port)
 	testServer := server.NewServer(
 		testServerAddr,
 		testHandler,
@@ -128,15 +140,17 @@ func setUpTestEnv() (*testEnv, func(), error) {
 	)
 	go testServer.Start()
 
-	return &testEnv{
-			addr:                 testServerAddr,
-			apiKey:               apiKey,
-			taskRepository:       taskRepository,
-			taskStatusRepository: taskStatusRepository,
-			taskResultRepository: taskResultRepository,
-		}, func() {
-			testServer.Shutdown(context.Background())
-			tearDown()
-			cleanup()
-		}, nil
+	tE = &testEnv{
+		addr:                 testServerAddr,
+		apiKey:               apiKey,
+		taskRepository:       taskRepository,
+		taskStatusRepository: taskStatusRepository,
+		taskResultRepository: taskResultRepository,
+	}
+
+	return tE, func() {
+		testServer.Shutdown(context.Background())
+		tearDown()
+		cleanup()
+	}, nil
 }
