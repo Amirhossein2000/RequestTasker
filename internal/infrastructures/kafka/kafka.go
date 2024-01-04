@@ -23,7 +23,7 @@ type TaskEventRepository struct {
 	reader *kafka.Reader
 }
 
-func NewTaskEventRepository(conf Config) *TaskEventRepository {
+func NewTaskEventRepository(ctx context.Context, conf Config) (*TaskEventRepository, error) {
 	dialer := &kafka.Dialer{
 		Timeout:   conf.Timeout,
 		DualStack: true,
@@ -42,11 +42,13 @@ func NewTaskEventRepository(conf Config) *TaskEventRepository {
 		Dialer:  dialer,
 	})
 
-	return &TaskEventRepository{
+	repo := &TaskEventRepository{
 		config: conf,
 		writer: writer,
 		reader: reader,
 	}
+
+	return repo, repo.createTopics(ctx)
 }
 
 func (r *TaskEventRepository) Read(ctx context.Context) ([]byte, error) {
@@ -60,7 +62,7 @@ func (r *TaskEventRepository) Write(ctx context.Context, value []byte) error {
 	})
 }
 
-func (r *TaskEventRepository) CreateTopics(ctx context.Context) error {
+func (r *TaskEventRepository) createTopics(ctx context.Context) error {
 	for _, broker := range r.config.Brokers {
 		conn, err := kafka.DialContext(ctx, "tcp", broker)
 		if err != nil {

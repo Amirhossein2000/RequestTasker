@@ -23,7 +23,8 @@ import (
 )
 
 func main() {
-	ctx := context.Background()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
 	mysqlConf, err := getMySQLConfig()
 	if err != nil {
@@ -38,7 +39,10 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	taskEventRepo := kafka.NewTaskEventRepository(*kafkaConf)
+	taskEventRepo, err := kafka.NewTaskEventRepository(ctx, *kafkaConf)
+	if err != nil {
+		panic(err)
+	}
 
 	taskRepo := mysql.NewTaskRepository(conn, "tasks")
 	taskStatusRepo := mysql.NewTaskStatusRepository(conn, "task_statuses")

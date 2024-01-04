@@ -1,6 +1,6 @@
 version: "3"
 
-dotenv: ['.env']
+dotenv: [".env"]
 
 # TODO: Descriptions
 
@@ -26,14 +26,19 @@ tasks:
   test-api:
     cmds:
       - go test -v -count=1 github.com/Amirhossein2000/RequestTasker/internal/app/api/handlers
+  test-tasker:
+    cmds:
+      - go test -v -count=1 github.com/Amirhossein2000/RequestTasker/internal/app/services/tasker
   test:
     - task: test-db
     - task: test-usecase
     - task: test-kafka
     - task: test-api
+    - task: test-tasker
   dep-up:
     cmds:
       - docker compose --env-file .env -f dep/docker-compose.yml up -d
+      - sleep 3
   dep-down:
     cmds:
       - docker-compose --env-file .env -f dep/docker-compose.yml down

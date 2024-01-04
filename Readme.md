@@ -19,6 +19,7 @@ brew install mockery
 brew install golang-migrate
 ```
 
-``` bash
-brew install direnv
-```
+[] test for tasker service
+[] Logger
+[] TODOs
+[] Readme.md

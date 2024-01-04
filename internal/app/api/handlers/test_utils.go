@@ -70,12 +70,15 @@ func setUpTestEnv() (*testEnv, func(), error) {
 		return tE, func() {}, nil
 	}
 
-	addr, cleanup, err := integration.SetupKafkaContainer(context.Background())
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+	defer cancel()
+
+	addr, cleanup, err := integration.SetupKafkaContainer(ctx)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	taskEventRepository := kafka.NewTaskEventRepository(
+	taskEventRepository, err := kafka.NewTaskEventRepository(ctx,
 		kafka.Config{
 			Brokers:           []string{addr},
 			Topic:             "test-topic",
@@ -85,6 +88,9 @@ func setUpTestEnv() (*testEnv, func(), error) {
 			ReplicationFactor: 1,
 		},
 	)
+	if err != nil {
+		return nil, nil, err
+	}
 
 	conn, tearDown, err := integration.SetupMySQLContainer()
 	if err != nil {
@@ -149,7 +155,7 @@ func setUpTestEnv() (*testEnv, func(), error) {
 	}
 
 	return tE, func() {
-		testServer.Shutdown(context.Background())
+		testServer.Shutdown(ctx)
 		tearDown()
 		cleanup()
 	}, nil

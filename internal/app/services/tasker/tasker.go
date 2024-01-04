@@ -106,7 +106,7 @@ func (t *Tasker) consume(ctx context.Context) error {
 				return err
 			}
 
-			err = t.sendTask(ctx, event.PublicID)
+			err = t.sendTask(ctx, event.PublicID) //TODO: multi routines
 			if err != nil {
 				// TODO: logs
 				return err
@@ -206,5 +206,3 @@ func (t *Tasker) sendTask(ctx context.Context, taskPublicID uuid.UUID) error {
 
 	return nil
 }
-
-// TODO, send all of the NEW tasks?

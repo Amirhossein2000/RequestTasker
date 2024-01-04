@@ -13,13 +13,16 @@ import (
 )
 
 func TestTaskEventRepository(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+	defer cancel()
+
 	addr, cleanup, err := integration.SetupKafkaContainer(context.Background())
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer cleanup()
 
-	repo := NewTaskEventRepository(
+	repo, err := NewTaskEventRepository(ctx,
 		Config{
 			Brokers:           []string{addr},
 			Topic:             "test-topic",
@@ -29,11 +32,6 @@ func TestTaskEventRepository(t *testing.T) {
 			ReplicationFactor: 1,
 		},
 	)
-
-	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
-	defer cancel()
-
-	err = repo.CreateTopics(ctx)
 	if err != nil {
 		t.Fatal(err)
 	}
