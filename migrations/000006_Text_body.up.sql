@@ -1,4 +1,4 @@
 ALTER TABLE
     tasks
 MODIFY
-    body TEXT;
+    body TEXT NULL;
