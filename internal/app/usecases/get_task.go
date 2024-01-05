@@ -17,13 +17,13 @@ type GetTaskUseCase struct {
 }
 
 func NewGetTaskUseCase(
-	logger logger.Logger,
+	logger *logger.Logger,
 	taskRepository entities.TaskRepository,
 	taskStatusRepository entities.TaskStatusRepository,
 	taskResultRepository entities.TaskResultRepository,
 ) GetTaskUseCase {
 	return GetTaskUseCase{
-		logger:               logger,
+		logger:               *logger,
 		taskRepository:       taskRepository,
 		taskStatusRepository: taskStatusRepository,
 		taskResultRepository: taskResultRepository,

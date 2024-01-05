@@ -21,7 +21,11 @@ func TestCreateTaskUseCase_Execute(t *testing.T) {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 		defer cancel()
 
-		logger := logger.NewLogger()
+		logger, err := logger.NewLogger(true)
+		if err != nil {
+			t.Fatal(err)
+		}
+
 		taskRepository := mocks.NewTaskRepositoryMock(t)
 		taskStatusRepository := mocks.NewTaskStatusRepositoryMock(t)
 		tasker := mocks.NewTaskerMock(t)

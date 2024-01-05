@@ -16,14 +16,14 @@ type Tasker interface {
 }
 
 type CreateTaskUseCase struct {
-	logger               logger.Logger
+	logger               *logger.Logger
 	taskRepository       entities.TaskRepository
 	tasker               Tasker
 	taskStatusRepository entities.TaskStatusRepository
 }
 
 func NewCreateTaskUseCase(
-	logger logger.Logger,
+	logger *logger.Logger,
 	taskRepository entities.TaskRepository,
 	taskStatusRepository entities.TaskStatusRepository,
 	tasker Tasker,

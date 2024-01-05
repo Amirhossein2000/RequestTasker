@@ -19,7 +19,5 @@ brew install mockery
 brew install golang-migrate
 ```
 
-[] test for tasker service
-[] Logger
 [] TODOs
 [] Readme.md

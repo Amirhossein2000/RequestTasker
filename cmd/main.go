@@ -57,8 +57,13 @@ func main() {
 	)
 	taskerService.Start(ctx)
 
-	createTaskUsecase := usecases.NewCreateTaskUseCase(logger.Logger{}, taskRepo, taskStatusRepo, taskerService)
-	getTaskUsecase := usecases.NewGetTaskUseCase(logger.Logger{}, taskRepo, taskStatusRepo, taskResultRepo)
+	logger, err := logger.NewLogger(false)
+	if err != nil {
+		panic(err)
+	}
+
+	createTaskUsecase := usecases.NewCreateTaskUseCase(logger, taskRepo, taskStatusRepo, taskerService)
+	getTaskUsecase := usecases.NewGetTaskUseCase(logger, taskRepo, taskStatusRepo, taskResultRepo)
 
 	handler := handlers.NewHandler(os.Getenv("APP_API_KEY"), createTaskUsecase, getTaskUsecase)
 

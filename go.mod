@@ -10,6 +10,7 @@ require (
 	github.com/samber/lo v1.39.0
 	github.com/stretchr/testify v1.8.4
 	github.com/testcontainers/testcontainers-go/modules/kafka v0.26.0
+	go.uber.org/zap v1.26.0
 )
 
 require (
@@ -53,6 +54,7 @@ require (
 	github.com/tklauser/numcpus v0.6.1 // indirect
 	github.com/yusufpapurcu/wmi v1.2.3 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
+	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/exp v0.0.0-20230510235704-dd950f8aeaea // indirect
 	golang.org/x/mod v0.13.0 // indirect
 	golang.org/x/tools v0.13.0 // indirect
