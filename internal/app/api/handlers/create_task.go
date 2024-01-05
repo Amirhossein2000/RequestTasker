@@ -39,7 +39,9 @@ func (h *Handler) PostTask(ctx context.Context, request api.PostTaskRequestObjec
 
 	publicId, err := h.createTaskUseCase.Execute(ctx, task)
 	if err != nil {
-		// TODO log
+		h.logger.Error("createTaskUseCase failed",
+			"error", err,
+		)
 		return api.PostTask500Response{}, nil
 	}
 

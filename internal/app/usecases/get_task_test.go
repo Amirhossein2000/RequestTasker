@@ -7,7 +7,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Amirhossein2000/RequestTasker/internal/app/services/logger"
 	"github.com/Amirhossein2000/RequestTasker/internal/domain/common"
 	"github.com/Amirhossein2000/RequestTasker/internal/domain/entities"
 	"github.com/Amirhossein2000/RequestTasker/internal/mocks"
@@ -21,16 +20,10 @@ func TestGetTaskUseCase_Execute(t *testing.T) {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 		defer cancel()
 
-		logger, err := logger.NewLogger(true)
-		if err != nil {
-			t.Fatal(err)
-		}
-
 		taskRepository := mocks.NewTaskRepositoryMock(t)
 		taskStatusRepository := mocks.NewTaskStatusRepositoryMock(t)
 		taskResultRepository := mocks.NewTaskResultRepositoryMock(t)
 		getTaskUseCase := NewGetTaskUseCase(
-			logger,
 			taskRepository,
 			taskStatusRepository,
 			taskResultRepository,

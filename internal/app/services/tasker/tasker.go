@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/Amirhossein2000/RequestTasker/internal/app/services/logger"
 	"github.com/Amirhossein2000/RequestTasker/internal/domain/common"
 	"github.com/Amirhossein2000/RequestTasker/internal/domain/dto"
 	"github.com/Amirhossein2000/RequestTasker/internal/domain/entities"
@@ -20,17 +21,17 @@ type TaskEventRepository interface {
 }
 
 type Tasker struct {
+	logger               *logger.Logger
 	taskEventRepository  TaskEventRepository
 	taskRepository       entities.TaskRepository
 	taskStatusRepository entities.TaskStatusRepository
 	taskResultRepository entities.TaskResultRepository
 	httpClient           *http.Client
 	in                   chan *entities.Task
-
-	// TODO logger
 }
 
 func NewTasker(
+	logger *logger.Logger,
 	taskEventRepository TaskEventRepository,
 	taskRepository entities.TaskRepository,
 	taskStatusRepository entities.TaskStatusRepository,
@@ -38,6 +39,7 @@ func NewTasker(
 	httpClient *http.Client,
 ) *Tasker {
 	return &Tasker{
+		logger:               logger,
 		taskEventRepository:  taskEventRepository,
 		taskRepository:       taskRepository,
 		taskStatusRepository: taskStatusRepository,
@@ -52,11 +54,11 @@ func (t *Tasker) Start(ctx context.Context) {
 	go t.consume(ctx)
 }
 
-func (t *Tasker) produce(ctx context.Context) error {
+func (t *Tasker) produce(ctx context.Context) {
 	for {
 		select {
 		case <-ctx.Done():
-			return nil
+			return
 
 		default:
 			task := <-t.in
@@ -65,13 +67,17 @@ func (t *Tasker) produce(ctx context.Context) error {
 			}
 			data, err := event.Serialize()
 			if err != nil {
-				// TODO: logs
-				return err
+				t.logger.Error("event Serialize failed",
+					"error", err,
+				)
+				continue
 			}
 			err = t.taskEventRepository.Write(ctx, data)
 			if err != nil {
-				// TODO: logs
-				return err
+				t.logger.Error("write event failed",
+					"error", err,
+				)
+				continue
 			}
 
 			taskStatus := entities.NewTaskStatus(
@@ -81,35 +87,40 @@ func (t *Tasker) produce(ctx context.Context) error {
 
 			_, err = t.taskStatusRepository.Create(ctx, taskStatus)
 			if err != nil {
-				// TODO: logs
-				return err
+				t.logger.Error("create taskStatus failed",
+					"error", err,
+				)
+				continue
 			}
 		}
 	}
 }
 
-func (t *Tasker) consume(ctx context.Context) error {
+func (t *Tasker) consume(ctx context.Context) {
 	for {
 		select {
 		case <-ctx.Done():
-			return nil
+			return
 		default:
 			data, err := t.taskEventRepository.Read(ctx)
 			if err != nil {
-				// TODO: logs
-				return err
+				t.logger.Error("read event failed",
+					"error", err,
+				)
 			}
 
 			event, err := dto.NewTaskEvent(data)
 			if err != nil {
-				// TODO: logs
-				return err
+				t.logger.Error("decentralizing event failed",
+					"error", err,
+				)
 			}
 
-			err = t.sendTask(ctx, event.PublicID) //TODO: multi routines
+			err = t.sendTask(ctx, event.PublicID)
 			if err != nil {
-				// TODO: logs
-				return err
+				t.logger.Error("sending task failed",
+					"error", err,
+				)
 			}
 		}
 	}
@@ -126,6 +137,8 @@ func (t *Tasker) RegisterTask(ctx context.Context, task entities.Task) error {
 }
 
 func (t *Tasker) sendTask(ctx context.Context, taskPublicID uuid.UUID) error {
+	//TODO: multi routines
+
 	task, err := t.taskRepository.GetByPublicID(ctx, taskPublicID)
 	if err != nil {
 		return err

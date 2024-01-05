@@ -19,7 +19,7 @@ type Task struct {
 	publicID  uuid.UUID
 
 	url     string
-	method  string // TODO: make this enum
+	method  string
 	headers map[string]string
 	body    string // TODO: make it pointer
 }
@@ -33,7 +33,7 @@ func NewTask(
 	return Task{
 		createdAt: time.Now(),
 		publicID:  uuid.New(),
-		url:       url, // TODO Should I check url validation here is it's already implemented by code-gen?
+		url:       url,
 		method:    method,
 		headers:   headers,
 		body:      body,

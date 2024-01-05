@@ -26,7 +26,9 @@ func (h *Handler) GetTaskId(ctx context.Context, request api.GetTaskIdRequestObj
 			return api.GetTaskId404Response{}, nil
 
 		default:
-			// TODO: log
+			h.logger.Error("getTaskUseCase failed",
+				"error", err,
+			)
 			return api.GetTaskId500Response{}, nil
 		}
 	}

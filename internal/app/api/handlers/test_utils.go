@@ -101,7 +101,13 @@ func setUpTestEnv() (*testEnv, func(), error) {
 	taskStatusRepository := mysql.NewTaskStatusRepository(conn, common.TaskStatusTable)
 	taskResultRepository := mysql.NewTaskResultRepository(conn, common.TaskResultTable)
 
+	logger, err := logger.NewLogger(true)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	tasker := tasker.NewTasker(
+		logger,
 		taskEventRepository,
 		taskRepository,
 		taskStatusRepository,
@@ -109,20 +115,13 @@ func setUpTestEnv() (*testEnv, func(), error) {
 		http.DefaultClient,
 	)
 
-	logger, err := logger.NewLogger(true)
-	if err != nil {
-		return nil, nil, err
-	}
-
 	createTaskUseCase := usecases.NewCreateTaskUseCase(
-		logger,
 		taskRepository,
 		taskStatusRepository,
 		tasker,
 	)
 
 	getTaskUseCase := usecases.NewGetTaskUseCase(
-		logger,
 		taskRepository,
 		taskStatusRepository,
 		taskResultRepository,
@@ -131,6 +130,7 @@ func setUpTestEnv() (*testEnv, func(), error) {
 	apiKey := random.String(32)
 
 	testHandler := NewHandler(
+		logger,
 		apiKey,
 		createTaskUseCase,
 		getTaskUseCase,

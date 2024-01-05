@@ -44,11 +44,17 @@ func main() {
 		panic(err)
 	}
 
+	logger, err := logger.NewLogger(false)
+	if err != nil {
+		panic(err)
+	}
+
 	taskRepo := mysql.NewTaskRepository(conn, "tasks")
 	taskStatusRepo := mysql.NewTaskStatusRepository(conn, "task_statuses")
 	taskResultRepo := mysql.NewTaskResultRepository(conn, "task_results")
 
 	taskerService := tasker.NewTasker(
+		logger,
 		taskEventRepo,
 		taskRepo,
 		taskStatusRepo,
@@ -57,16 +63,10 @@ func main() {
 	)
 	taskerService.Start(ctx)
 
-	logger, err := logger.NewLogger(false)
-	if err != nil {
-		panic(err)
-	}
+	createTaskUsecase := usecases.NewCreateTaskUseCase(taskRepo, taskStatusRepo, taskerService)
+	getTaskUsecase := usecases.NewGetTaskUseCase(taskRepo, taskStatusRepo, taskResultRepo)
 
-	createTaskUsecase := usecases.NewCreateTaskUseCase(logger, taskRepo, taskStatusRepo, taskerService)
-	getTaskUsecase := usecases.NewGetTaskUseCase(logger, taskRepo, taskStatusRepo, taskResultRepo)
-
-	handler := handlers.NewHandler(os.Getenv("APP_API_KEY"), createTaskUsecase, getTaskUsecase)
-
+	handler := handlers.NewHandler(logger, os.Getenv("APP_API_KEY"), createTaskUsecase, getTaskUsecase)
 	httpServer := server.NewServer(os.Getenv("APP_SERVER_ADDR"), handler, []api.StrictMiddlewareFunc{handler.AuthMiddleware})
 	go func() {
 		err := httpServer.Start()

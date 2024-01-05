@@ -3,7 +3,6 @@ package usecases
 import (
 	"context"
 
-	"github.com/Amirhossein2000/RequestTasker/internal/app/services/logger"
 	"github.com/Amirhossein2000/RequestTasker/internal/domain/common"
 	"github.com/Amirhossein2000/RequestTasker/internal/domain/entities"
 
@@ -16,20 +15,17 @@ type Tasker interface {
 }
 
 type CreateTaskUseCase struct {
-	logger               *logger.Logger
 	taskRepository       entities.TaskRepository
 	tasker               Tasker
 	taskStatusRepository entities.TaskStatusRepository
 }
 
 func NewCreateTaskUseCase(
-	logger *logger.Logger,
 	taskRepository entities.TaskRepository,
 	taskStatusRepository entities.TaskStatusRepository,
 	tasker Tasker,
 ) CreateTaskUseCase {
 	return CreateTaskUseCase{
-		logger:               logger,
 		taskRepository:       taskRepository,
 		taskStatusRepository: taskStatusRepository,
 		tasker:               tasker,

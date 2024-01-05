@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/Amirhossein2000/RequestTasker/internal/app/services/logger"
 	"github.com/Amirhossein2000/RequestTasker/internal/domain/common"
 	"github.com/Amirhossein2000/RequestTasker/internal/domain/entities"
 	"github.com/Amirhossein2000/RequestTasker/internal/infrastructures/kafka"
@@ -47,11 +48,17 @@ func TestTasker(t *testing.T) {
 	}
 	defer tearDown()
 
+	logger, err := logger.NewLogger(false)
+	if err != nil {
+		panic(err)
+	}
+
 	taskRepository := mysql.NewTaskRepository(conn, common.TaskTable)
 	taskStatusRepository := mysql.NewTaskStatusRepository(conn, common.TaskStatusTable)
 	taskResultRepository := mysql.NewTaskResultRepository(conn, common.TaskResultTable)
 
 	tasker := NewTasker(
+		logger,
 		taskEventRepository,
 		taskRepository,
 		taskStatusRepository,
