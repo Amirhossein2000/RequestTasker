@@ -44,6 +44,7 @@ tasks:
   dep-down:
     cmds:
       - docker-compose --env-file .env -f dep/docker-compose.yml down
+      - docker network rm tasker-network
   migrate:
     cmds:
       - migrate -source file://migrations -database "mysql://$MYSQL_USER:$MYSQL_PASSWORD@tcp(localhost:3306)/$MYSQL_DB" up
@@ -62,7 +63,6 @@ tasks:
     cmds:
       - task: docker-down
       - task: dep-down
-      - docker network rm tasker-network
   server-up:
     cmds:
       - export $(cat .env | xargs) && ./bin/cmd
