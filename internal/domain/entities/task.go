@@ -21,7 +21,7 @@ type Task struct {
 	url     string
 	method  string
 	headers map[string]string
-	body    string // TODO: make it pointer
+	body    string
 }
 
 func NewTask(

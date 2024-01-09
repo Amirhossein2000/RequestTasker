@@ -8,6 +8,7 @@ import (
 
 	"github.com/Amirhossein2000/RequestTasker/internal/domain/common"
 	"github.com/Amirhossein2000/RequestTasker/internal/domain/entities"
+	"github.com/samber/lo"
 
 	"github.com/gocraft/dbr/v2"
 	"github.com/google/uuid"
@@ -18,23 +19,32 @@ type TaskRow struct {
 	CreatedAt time.Time `db:"created_at"`
 	PublicID  string    `db:"public_id"`
 
-	Url     string `db:"url"`
-	Method  string `db:"method"`
-	Headers string `db:"headers"`
-	Body    string `db:"body"`
+	Url     string  `db:"url"`
+	Method  string  `db:"method"`
+	Headers *string `db:"headers"`
+	Body    *string `db:"body"`
 }
 
 func (r *TaskRow) ConvertToEntity() (*entities.Task, error) {
 	headers := make(map[string]string)
 
-	err := json.Unmarshal([]byte(r.Headers), &headers)
-	if err != nil {
-		return nil, err
+	if r.Headers != nil {
+		err := json.Unmarshal([]byte(*r.Headers), &headers)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		headers = nil
 	}
 
 	publicID, err := uuid.Parse(r.PublicID)
 	if err != nil {
 		return nil, err
+	}
+
+	body := ""
+	if r.Body != nil {
+		body = *r.Body
 	}
 
 	task := entities.BuildTask(
@@ -44,7 +54,7 @@ func (r *TaskRow) ConvertToEntity() (*entities.Task, error) {
 		r.Url,
 		r.Method,
 		headers,
-		r.Body,
+		body,
 	)
 
 	return &task, nil
@@ -63,9 +73,23 @@ func NewTaskRepository(conn *dbr.Connection, tableName string) *TaskRepository {
 }
 
 func (r *TaskRepository) Create(ctx context.Context, task entities.Task) (*entities.Task, error) {
-	headers, err := json.Marshal(task.Headers())
-	if err != nil {
-		return nil, err
+	var headers *string
+
+	if task.Headers() != nil {
+		data, err := json.Marshal(task.Headers())
+		if err != nil {
+			return nil, err
+		}
+		headers = lo.ToPtr(string(data))
+	} else {
+		headers = nil
+	}
+
+	var body *string
+	if taskBody := task.Body(); taskBody != "" {
+		body = &taskBody
+	} else {
+		body = nil
 	}
 
 	result, err := r.session.InsertInto(r.tableName).
@@ -80,8 +104,8 @@ func (r *TaskRepository) Create(ctx context.Context, task entities.Task) (*entit
 			task.PublicID().String(),
 			task.Url(),
 			task.Method(),
-			string(headers),
-			task.Body(),
+			headers,
+			body,
 		).
 		ExecContext(ctx)
 

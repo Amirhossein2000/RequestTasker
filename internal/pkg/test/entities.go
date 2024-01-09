@@ -6,7 +6,9 @@ func NewTestTask() entities.Task {
 	return entities.NewTask(
 		"https://example.com",
 		"GET",
-		map[string]string{"Authorization": "Bearer token test"},
+		map[string]string{
+			"Authorization": "Bearer token test",
+		},
 		`
 			{
 				"test":	"test"
