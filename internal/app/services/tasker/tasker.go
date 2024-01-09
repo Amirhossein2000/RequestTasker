@@ -27,7 +27,8 @@ type Tasker struct {
 	taskStatusRepository entities.TaskStatusRepository
 	taskResultRepository entities.TaskResultRepository
 	httpClient           *http.Client
-	in                   chan *entities.Task
+	produceChan          chan *entities.Task
+	consumeChan          chan []byte
 }
 
 func NewTasker(
@@ -45,11 +46,16 @@ func NewTasker(
 		taskStatusRepository: taskStatusRepository,
 		taskResultRepository: taskResultRepository,
 		httpClient:           httpClient,
-		in:                   make(chan *entities.Task, 128),
+		produceChan:          make(chan *entities.Task, 128),
+		consumeChan:          make(chan []byte, 128),
 	}
 }
 
 func (t *Tasker) Start(ctx context.Context) {
+	for i := 0; i < 10; i++ {
+		go t.eventHandler(ctx)
+	}
+
 	go t.produce(ctx)
 	go t.consume(ctx)
 }
@@ -60,8 +66,7 @@ func (t *Tasker) produce(ctx context.Context) {
 		case <-ctx.Done():
 			return
 
-		default:
-			task := <-t.in
+		case task := <-t.produceChan:
 			event := dto.TaskEvent{
 				PublicID: task.PublicID(),
 			}
@@ -107,28 +112,17 @@ func (t *Tasker) consume(ctx context.Context) {
 				t.logger.Error("read event failed",
 					"error", err,
 				)
+				continue
 			}
 
-			event, err := dto.NewTaskEvent(data)
-			if err != nil {
-				t.logger.Error("decentralizing event failed",
-					"error", err,
-				)
-			}
-
-			err = t.sendTask(ctx, event.PublicID)
-			if err != nil {
-				t.logger.Error("sending task failed",
-					"error", err,
-				)
-			}
+			t.consumeChan <- data
 		}
 	}
 }
 
-func (t *Tasker) RegisterTask(ctx context.Context, task entities.Task) error {
+func (t *Tasker) Process(ctx context.Context, task entities.Task) error {
 	select {
-	case t.in <- &task:
+	case t.produceChan <- &task:
 		return nil
 
 	default:
@@ -136,9 +130,33 @@ func (t *Tasker) RegisterTask(ctx context.Context, task entities.Task) error {
 	}
 }
 
-func (t *Tasker) sendTask(ctx context.Context, taskPublicID uuid.UUID) error {
-	//TODO: multi routines
+func (t *Tasker) eventHandler(ctx context.Context) {
+	for {
+		select {
+		case <-ctx.Done():
+			return
 
+		case data := <-t.consumeChan:
+			event, err := dto.NewTaskEvent(data)
+			if err != nil {
+				t.logger.Error("decentralizing event failed",
+					"error", err,
+				)
+				continue
+			}
+
+			err = t.sendTask(ctx, event.PublicID)
+			if err != nil {
+				t.logger.Error("sending task failed",
+					"error", err,
+				)
+				continue
+			}
+		}
+	}
+}
+
+func (t *Tasker) sendTask(ctx context.Context, taskPublicID uuid.UUID) error {
 	task, err := t.taskRepository.GetByPublicID(ctx, taskPublicID)
 	if err != nil {
 		return err

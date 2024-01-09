@@ -70,18 +70,18 @@ func TestCreateTaskUseCase_Execute(t *testing.T) {
 					On("Create", ctx, expectedStatus).
 					Return(&expectedStatus, nil)
 
-				Convey("When tasker.RegisterTask() returns error", func() {
+				Convey("When tasker.Process() returns error", func() {
 					tasker.
-						On("RegisterTask", ctx, expectedTask).
+						On("Process", ctx, expectedTask).
 						Return(expectedErr)
 
 					_, err := createTaskUseCase.Execute(ctx, newTask)
 					So(err, ShouldEqual, expectedErr)
 				})
 
-				Convey("When tasker.RegisterTask() works", func() {
+				Convey("When tasker.Process() works", func() {
 					tasker.
-						On("RegisterTask", ctx, expectedTask).
+						On("Process", ctx, expectedTask).
 						Return(nil)
 
 					publicID, err := createTaskUseCase.Execute(ctx, newTask)
