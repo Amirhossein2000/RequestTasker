@@ -91,7 +91,7 @@ func TestTasker(t *testing.T) {
 
 	Convey("Register and send a request", t, func() {
 		Convey("When status is done", func() {
-			err := tasker.RegisterTask(ctx, *expectedTask)
+			err := tasker.Process(ctx, *expectedTask)
 			So(err, ShouldBeNil)
 
 			time.Sleep(time.Second * 5)

@@ -14,12 +14,12 @@ type TaskerMock struct {
 	mock.Mock
 }
 
-// RegisterTask provides a mock function with given fields: ctx, task
-func (_m *TaskerMock) RegisterTask(ctx context.Context, task entities.Task) error {
+// Process provides a mock function with given fields: ctx, task
+func (_m *TaskerMock) Process(ctx context.Context, task entities.Task) error {
 	ret := _m.Called(ctx, task)
 
 	if len(ret) == 0 {
-		panic("no return value specified for RegisterTask")
+		panic("no return value specified for Process")
 	}
 
 	var r0 error

@@ -11,7 +11,7 @@ import (
 
 //go:generate mockery --name Tasker --structname TaskerMock --output ../../mocks/
 type Tasker interface {
-	RegisterTask(ctx context.Context, task entities.Task) error
+	Process(ctx context.Context, task entities.Task) error
 }
 
 type CreateTaskUseCase struct {
@@ -32,6 +32,7 @@ func NewCreateTaskUseCase(
 	}
 }
 
+// CreateTaskUseCase creates entities to db and 
 func (u CreateTaskUseCase) Execute(ctx context.Context, task entities.Task) (uuid.UUID, error) {
 	createdTask, err := u.taskRepository.Create(ctx, task)
 	if err != nil {
@@ -44,7 +45,7 @@ func (u CreateTaskUseCase) Execute(ctx context.Context, task entities.Task) (uui
 		return uuid.Nil, err
 	}
 
-	err = u.tasker.RegisterTask(ctx, *createdTask)
+	err = u.tasker.Process(ctx, *createdTask)
 	if err != nil {
 		return uuid.Nil, err
 	}
