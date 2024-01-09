@@ -32,7 +32,7 @@ func NewCreateTaskUseCase(
 	}
 }
 
-// CreateTaskUseCase creates entities to db and 
+// CreateTaskUseCase creates entities and process the new task
 func (u CreateTaskUseCase) Execute(ctx context.Context, task entities.Task) (uuid.UUID, error) {
 	createdTask, err := u.taskRepository.Create(ctx, task)
 	if err != nil {

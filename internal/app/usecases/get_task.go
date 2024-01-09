@@ -3,14 +3,12 @@ package usecases
 import (
 	"context"
 
-	"github.com/Amirhossein2000/RequestTasker/internal/app/services/logger"
 	"github.com/Amirhossein2000/RequestTasker/internal/domain/entities"
 
 	"github.com/google/uuid"
 )
 
 type GetTaskUseCase struct {
-	logger               logger.Logger
 	taskRepository       entities.TaskRepository
 	taskStatusRepository entities.TaskStatusRepository
 	taskResultRepository entities.TaskResultRepository
@@ -28,6 +26,7 @@ func NewGetTaskUseCase(
 	}
 }
 
+// GetTaskUseCase returns the latest status and results of a tasks by task.PublicID
 func (u GetTaskUseCase) Execute(ctx context.Context, publicID uuid.UUID) (*entities.Task, *entities.TaskStatus, *entities.TaskResult, error) {
 	task, err := u.taskRepository.GetByPublicID(ctx, publicID)
 	if err != nil {
