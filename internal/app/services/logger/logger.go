@@ -19,15 +19,15 @@ func NewLogger(debug bool) (*Logger, error) {
 }
 
 func (l *Logger) Error(msg string, keysAndValues ...interface{}) {
-	l.z.Sugar().Errorw(msg, keysAndValues)
+	l.z.Sugar().Errorw(msg, keysAndValues...)
 }
 
 func (l *Logger) Info(msg string, keysAndValues ...interface{}) {
-	l.z.Sugar().Infow(msg, keysAndValues)
+	l.z.Sugar().Infow(msg, keysAndValues...)
 }
 
 func (l *Logger) Debug(msg string, keysAndValues ...interface{}) {
 	if l.debug {
-		l.z.Sugar().Debugw(msg, keysAndValues)
+		l.z.Sugar().Debugw(msg, keysAndValues...)
 	}
 }
