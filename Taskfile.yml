@@ -62,6 +62,7 @@ tasks:
     cmds:
       - task: docker-down
       - task: dep-down
+      - docker network rm tasker-network
   server-up:
     cmds:
       - export $(cat .env | xargs) && ./bin/cmd
