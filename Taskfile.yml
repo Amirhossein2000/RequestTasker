@@ -13,7 +13,7 @@ tasks:
       - go generate ./...
   build:
     cmds:
-      - go build -o ./bin ./cmd/
+      - mkdir -p ./bin && go build -o ./bin/ ./cmd/
   test-db:
     cmds:
       - go test -v -count=1 github.com/Amirhossein2000/RequestTasker/internal/infrastructures/mysql
@@ -37,8 +37,10 @@ tasks:
     - task: test-tasker
   dep-up:
     cmds:
+      - docker network create tasker-network
       - docker compose --env-file .env -f dep/docker-compose.yml up -d
-      - sleep 3
+      - sleep 10
+      - task: migrate
   dep-down:
     cmds:
       - docker-compose --env-file .env -f dep/docker-compose.yml down
@@ -52,10 +54,14 @@ tasks:
     cmds:
       - docker ps -q --filter "name=tasker" | xargs -r docker stop
       - docker ps -aq --filter "name=tasker" | xargs -r docker rm
-      - docker run --env-file .env --env-file ./dep/.env -p 8080:8080 --name tasker tasker
-  docker-purge:
+      - docker run --env-file .env --env-file ./dep/.env --network tasker-network -p 8080:8080 --name tasker tasker
+  docker-down:
     cmds:
       - docker stop tasker && docker rm tasker && docker rmi tasker
+  docker-purge:
+    cmds:
+      - task: docker-down
+      - task: dep-down
   server-up:
     cmds:
       - export $(cat .env | xargs) && ./bin/cmd

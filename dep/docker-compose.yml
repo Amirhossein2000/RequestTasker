@@ -1,5 +1,9 @@
 version: '3.8'
 
+networks:
+  tasker-network:
+    external: true
+
 services:
   zookeeper:
     image: wurstmeister/zookeeper:latest
@@ -13,6 +17,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
+    networks:
+      - tasker-network
 
   kafka:
     image: wurstmeister/kafka:latest
@@ -38,6 +44,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
+    networks:
+      - tasker-network
 
   mysql:
     image: mysql:latest
@@ -53,7 +61,7 @@ services:
           "mysqladmin",
           "ping",
           "-h",
-          "localhost",
+          "mysql",
           "--silent"
         ]
       interval: 10s
@@ -62,3 +70,5 @@ services:
     command: [ "--init-file", "/docker-entrypoint-initdb.d/init.sql" ]
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - tasker-network
