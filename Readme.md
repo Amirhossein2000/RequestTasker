@@ -1,23 +1,22 @@
 ### Summery
 
-This is an async request sender that takes an http request from an http endpoint and send the request and then expose the results and status in the second endpoint. Project-Structure is DDD.
+- This is an async request sender.
+- The project adheres to the Domain-Driven Design (DDD) principles in its structure.
+- A message broker is employed to enhance scalability and prevent data loss.
+- There are 3 entities that are stored to the database
+- Server service handles two HTTP endpoints to register the request and expose the result
+- Tasker service produce and consume the task(request) and sends the request to the third-party servers and store the result in db
 
 ![Flow](./images/request_tasker_flow.drawio.svg)
 
-### Database Schema
-
 ![Schema](./images/request_tasker_DB.drawio.svg)
 
-| Dependencies                                                |
-| ----------------------------------------------------------- |
-| [oapi-codegen](https://github.com/deepmap/oapi-codegen)     |
-| [taskfile](https://taskfile.dev/)                           |
-| [mockery](https://github.com/vektra/mockery)                |
-| [golang-migrate](https://github.com/golang-migrate/migrate) |
+### Dependencies
 
-Configs are in .env but for docker container some overwrites exists in ./dep/.env
-
-### Install Dependencies
+- [oapi-codegen](https://github.com/deepmap/oapi-codegen)     
+- [taskfile](https://taskfile.dev/)                           
+- [mockery](https://github.com/vektra/mockery)                
+- [golang-migrate](https://github.com/golang-migrate/migrate) 
 
 ``` bash
 go install github.com/deepmap/oapi-codegen/v2/cmd/oapi-codegen@latest
@@ -28,11 +27,11 @@ go get -u github.com/deepmap/oapi-codegen/v2/cmd/oapi-codegen
 ```
 
 ``` bash
-brew install go-task
+go install github.com/vektra/mockery/v2@v2.38.0
 ```
 
 ``` bash
-go install github.com/vektra/mockery/v2@v2.38.0
+brew install go-task
 ```
 
 ``` bash
@@ -42,6 +41,11 @@ brew install mockery
 ``` bash
 brew install golang-migrate
 ```
+
+### Taskfile
+
+Instead of MakeFile there is Taskfile in this project. Check this [Taskfile.yml](./Taskfile.yml) for all of the commands and descriptions.
+
 
 ### Run
 
@@ -53,9 +57,22 @@ task dep-up
 task run
 ```
 
+### Configs
+
+- All of the configs are in [.env](./.env) file.
+- Docker conainer overwrites a few configs in [./dep/.env](./dep/.env)
+
 ### Testing
 
-There are both mocked and integration tests in this project, implemented by mockery and testcontainer
+There are both mocked and integration tests in this project, implemented by mockery and [testcontainer](https://testcontainers.com/).
+Run all tests by this commad: `task test`
+- Run only a single test:
+  - `task test-usecase`
+  - `task test-api`
+  - `task test-tasker`
+  - `task test-db`
+  - `task test-kafka`
 
-### future
-dead letter queue for missed requests
+
+### Future
+Right now there isn't any retry mechanisem for failed requests so if a dead letter queue get added in this project then the failed requests can be retried.
