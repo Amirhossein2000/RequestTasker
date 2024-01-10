@@ -15,7 +15,7 @@
 ### Dependencies
 
 - [oapi-codegen](https://github.com/deepmap/oapi-codegen)     
-- [taskfile](https://taskfile.dev/)                           
+- [Taskfile](https://taskfile.dev/)                           
 - [mockery](https://github.com/vektra/mockery)                
 - [golang-migrate](https://github.com/golang-migrate/migrate) 
 
@@ -75,6 +75,6 @@ To run specific tests:
 
 In the case of any changes in interfaces, it's requried to run the `task generate-mock` command.
 
-### Future
+### Additional Considerations for the Future
 
-Currently, there is no retry mechanism for failed requests. If a dead-letter queue is added to this project, failed requests can be retried.
+- [ ] Currently, there is no retry mechanism for failed requests. If a dead-letter queue is added to this project, failed requests can be retried.
