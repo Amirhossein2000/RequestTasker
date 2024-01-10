@@ -55,7 +55,7 @@ tasks:
   dep-up:
     desc: Set up the project dependencies using Docker Compose
     cmds:
-      - docker network create tasker-network
+      - docker network create $DOCKER_NETWORK_NAME
       - docker compose --env-file .env -f dep/docker-compose.yml up -d
       - sleep 10
       - task: migrate
@@ -64,7 +64,7 @@ tasks:
     desc: Tear down the project dependencies
     cmds:
       - docker-compose --env-file .env -f dep/docker-compose.yml down
-      - docker network rm tasker-network
+      - docker network rm $DOCKER_NETWORK_NAME
 
   migrate:
     desc: Run database migrations
@@ -72,21 +72,21 @@ tasks:
       - migrate -source file://migrations -database "mysql://$MYSQL_USER:$MYSQL_PASSWORD@tcp(localhost:3306)/$MYSQL_DB" up
 
   docker-build:
-    desc: Build the tasker Docker image
+    desc: Build the app Docker image
     cmds:
-      - docker build -t tasker .
+      - docker build -t $DOCKER_IMAGE_NAME .
 
   docker-up:
-    desc: Start the tasker Docker container named
+    desc: Start the app Docker container
     cmds:
-      - docker ps -q --filter "name=tasker" | xargs -r docker stop
-      - docker ps -aq --filter "name=tasker" | xargs -r docker rm
-      - docker run --env-file .env --env-file ./dep/.env --network tasker-network -p 8080:8080 --name tasker tasker
+      - docker ps -q --filter "name=$DOCKER_IMAGE_NAME" | xargs -r docker stop
+      - docker ps -aq --filter "name=$DOCKER_IMAGE_NAME" | xargs -r docker rm
+      - docker run --env-file .env --env-file ./dep/.env --network $DOCKER_NETWORK_NAME -p 8080:8080 --name $DOCKER_IMAGE_NAME $DOCKER_IMAGE_NAME
 
   docker-down:
-    desc: Stop and remove the tasker Docker container
+    desc: Stop and remove the app Docker container
     cmds:
-      - docker stop tasker && docker rm tasker && docker rmi tasker
+      - docker stop $DOCKER_IMAGE_NAME && docker rm $DOCKER_IMAGE_NAME && docker rmi $DOCKER_IMAGE_NAME
 
   docker-purge:
     desc: Remove both Docker container and project dependencies
