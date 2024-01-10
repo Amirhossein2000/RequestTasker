@@ -13,11 +13,6 @@ tasks:
     cmds:
       - go generate ./...
 
-  build:
-    desc: Build the project
-    cmds:
-      - mkdir -p ./bin && go build -o ./bin/ ./cmd/
-
   test-db:
     desc: Run tests for the database infrastructure package
     cmds:
@@ -46,11 +41,11 @@ tasks:
   test:
     desc: Run all tests
     cmds:
-      - task: test-db
       - task: test-usecase
-      - task: test-kafka
       - task: test-api
       - task: test-tasker
+      - task: test-db
+      - task: test-kafka
 
   dep-up:
     desc: Set up the project dependencies using Docker Compose
@@ -65,12 +60,6 @@ tasks:
     cmds:
       - docker-compose --env-file .env -f dep/docker-compose.yml down
       - docker network rm $DOCKER_NETWORK_NAME
-
-  migrate:
-    desc: Run database migrations
-    cmds:
-      - migrate -source file://migrations -database "mysql://$MYSQL_USER:$MYSQL_PASSWORD@tcp(localhost:3306)/$MYSQL_DB" up
-
   docker-build:
     desc: Build the app Docker image
     cmds:
@@ -93,6 +82,16 @@ tasks:
     cmds:
       - task: docker-down
       - task: dep-down
+
+  migrate:
+    desc: Run database migrations
+    cmds:
+      - migrate -source file://migrations -database "mysql://$MYSQL_USER:$MYSQL_PASSWORD@tcp(localhost:3306)/$MYSQL_DB" up
+
+  build:
+    desc: Build the project
+    cmds:
+      - mkdir -p ./bin && go build -o ./bin/ ./cmd/
 
   run:
     desc: Start the server
