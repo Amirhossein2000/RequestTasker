@@ -1,7 +1,12 @@
-### Request flow
+### Summery
 
-TODO: draw.io
-Call create task api --> produce to Kafka --> consume from kafka --> send request --> save result is db
+This is an async request sender that takes an http request from an http endpoint and send the request and then expose the results and status in the second endpoint. Project-Structure is DDD.
+
+![Flow](./images/request_tasker_flow.drawio.svg)
+
+### Database Schema
+
+![Schema](./images/request_tasker_DB.drawio.svg)
 
 | Dependencies                                                |
 | ----------------------------------------------------------- |
@@ -9,6 +14,8 @@ Call create task api --> produce to Kafka --> consume from kafka --> send reques
 | [taskfile](https://taskfile.dev/)                           |
 | [mockery](https://github.com/vektra/mockery)                |
 | [golang-migrate](https://github.com/golang-migrate/migrate) |
+
+Configs are in .env but for docker container some overwrites exists in ./dep/.env
 
 ### Install Dependencies
 
@@ -45,6 +52,10 @@ task dep-up
 ``` bash
 task run
 ```
+
+### Testing
+
+There are both mocked and integration tests in this project, implemented by mockery and testcontainer
 
 ### future
 dead letter queue for missed requests
