@@ -1,3 +1,11 @@
+/*
+	Main jobs in this package:
+		1. Emit tasks to the message broker for distribution.
+		2. Acquire and process tasks from the message broker.
+		3. Dispatch tasks to third-party endpoints.
+		4. Archive task results and their statuses in the database.
+*/
+
 package tasker
 
 import (
