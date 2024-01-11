@@ -57,6 +57,10 @@ task dep-up
 task run
 ```
 
+### API Documentation
+
+Chcek this [api.yml](./openapi/api.yml) openapi file.
+
 ### Configs
 
 - All configurations are in the [.env](./.env) file.
