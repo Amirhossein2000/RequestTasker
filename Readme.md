@@ -82,3 +82,4 @@ In the case of any changes in interfaces, it's requried to run the `task generat
 ### Additional Considerations for the Future
 
 - [ ] Currently, there is no retry mechanism for failed requests. If a dead-letter queue is added to this project, failed requests can be retried.
+- [ ] Optimize test environment by leveraging local infrastructure instead of creating and deleting containers for each test.
