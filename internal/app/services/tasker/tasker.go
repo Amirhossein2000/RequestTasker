@@ -68,43 +68,42 @@ func (t *Tasker) Start(ctx context.Context) {
 	go t.consume(ctx)
 }
 
+func (t *Tasker) Shutdown() {
+	close(t.produceChan)
+	close(t.consumeChan)
+}
+
 func (t *Tasker) produce(ctx context.Context) {
-	for {
-		select {
-		case <-ctx.Done():
-			return
-
-		case task := <-t.produceChan:
-			event := dto.TaskEvent{
-				PublicID: task.PublicID(),
-			}
-			data, err := event.Serialize()
-			if err != nil {
-				t.logger.Error("event Serialize failed",
-					"error", err,
-				)
-				continue
-			}
-			err = t.taskEventRepository.Write(ctx, data)
-			if err != nil {
-				t.logger.Error("write event failed",
-					"error", err,
-				)
-				continue
-			}
-
-			taskStatus := entities.NewTaskStatus(
-				task.ID(),
-				common.StatusInProcess,
+	for task := range t.produceChan {
+		event := dto.TaskEvent{
+			PublicID: task.PublicID(),
+		}
+		data, err := event.Serialize()
+		if err != nil {
+			t.logger.Error("event Serialize failed",
+				"error", err,
 			)
+			continue
+		}
+		err = t.taskEventRepository.Write(ctx, data)
+		if err != nil {
+			t.logger.Error("write event failed",
+				"error", err,
+			)
+			continue
+		}
 
-			_, err = t.taskStatusRepository.Create(ctx, taskStatus)
-			if err != nil {
-				t.logger.Error("create taskStatus failed",
-					"error", err,
-				)
-				continue
-			}
+		taskStatus := entities.NewTaskStatus(
+			task.ID(),
+			common.StatusInProcess,
+		)
+
+		_, err = t.taskStatusRepository.Create(ctx, taskStatus)
+		if err != nil {
+			t.logger.Error("create taskStatus failed",
+				"error", err,
+			)
+			continue
 		}
 	}
 }
@@ -139,27 +138,21 @@ func (t *Tasker) Process(ctx context.Context, task entities.Task) error {
 }
 
 func (t *Tasker) eventHandler(ctx context.Context) {
-	for {
-		select {
-		case <-ctx.Done():
-			return
+	for data := range t.consumeChan {
+		event, err := dto.NewTaskEvent(data)
+		if err != nil {
+			t.logger.Error("decentralizing event failed",
+				"error", err,
+			)
+			continue
+		}
 
-		case data := <-t.consumeChan:
-			event, err := dto.NewTaskEvent(data)
-			if err != nil {
-				t.logger.Error("decentralizing event failed",
-					"error", err,
-				)
-				continue
-			}
-
-			err = t.sendTask(ctx, event.PublicID)
-			if err != nil {
-				t.logger.Error("sending task failed",
-					"error", err,
-				)
-				continue
-			}
+		err = t.sendTask(ctx, event.PublicID)
+		if err != nil {
+			t.logger.Error("sending task failed",
+				"error", err,
+			)
+			continue
 		}
 	}
 }
@@ -189,6 +182,8 @@ func (t *Tasker) sendTask(ctx context.Context, taskPublicID uuid.UUID) error {
 	}
 
 	resp, err := t.httpClient.Do(req)
+	defer resp.Body.Close()
+
 	if err != nil {
 		taskStatus := entities.NewTaskStatus(
 			task.ID(),

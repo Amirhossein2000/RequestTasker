@@ -66,6 +66,7 @@ func TestTasker(t *testing.T) {
 		http.DefaultClient,
 	)
 	tasker.Start(ctx)
+	defer tasker.Shutdown()
 
 	port, url := getPortAndUrl()
 	newTask := entities.NewTask(
